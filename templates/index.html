@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Microheater Design | Automated Microheater Design</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+<style>
+
+    body {
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* HERO */
+    .hero-image {
+        animation: emerge 0.8s ease-out forwards;
+    }
+
+    @keyframes emerge {
+        from {
+            opacity: 0;
+            transform: translateY(20px) scale(0.97);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+
+    /* TEAM DRIFT WALL */
+
+    .team-photo {
+        height: 210px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 8px 24px rgba(40, 66, 105, 0.08);
+        will-change: transform;
+    }
+
+    .photo-1 {
+        animation: drift1 6s ease-in-out infinite alternate;
+    }
+
+    .photo-2 {
+        animation: drift2 8s ease-in-out infinite alternate;
+    }
+
+    .photo-3 {
+        animation: drift3 7s ease-in-out infinite alternate;
+    }
+
+    .photo-4 {
+        animation: drift4 9s ease-in-out infinite alternate;
+    }
+
+    .photo-5 {
+        animation: drift5 7.5s ease-in-out infinite alternate;
+    }
+
+    .photo-6 {
+        animation: drift6 8.5s ease-in-out infinite alternate;
+    }
+
+    .photo-7 {
+        animation: drift7 6.5s ease-in-out infinite alternate;
+    }
+
+    .photo-8 {
+        animation: drift8 9.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift1 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(25px, -18px);
+        }
+    }
+
+    @keyframes drift2 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(-22px, 25px);
+        }
+    }
+
+    @keyframes drift3 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(20px, 22px);
+        }
+    }
+
+    @keyframes drift4 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(-25px, -15px);
+        }
+    }
+
+    @keyframes drift5 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(23px, 18px);
+        }
+    }
+
+    @keyframes drift6 {
+        from {
+            transform: translate(0, 0);
+        }
+
+        to {
+            transform: translate(-20px, -22px);
+        }
+    }
+
+    @keyframes drift7 {
+        from {
+            transform: translate(26px, 0);
+        }
+
+        to {
+            transform: translate(-5px, -20px);
+        }
+    }
+
+    @keyframes drift8 {
+        from {
+            transform: translate(-15px, 10px);
+        }
+
+        to {
+            transform: translate(12px, 28px);
+        }
+    }
+
+</style>
+</head>
+
+
+<body class="bg-white text-[#284269]">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+<header
+    id="main-header"
+    class="fixed top-0 left-0 right-0 z-50
+           h-16 border-b border-slate-200 bg-white
+           flex items-center justify-between px-6
+           transition-transform duration-300">
+
+    <div class="flex items-center gap-4">
+
+        <!-- Menu -->
+        <button
+            onclick="toggleSidebar()">
+
+            <i class="fa-solid fa-bars text-xl"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- Header information -->
+
+    <div class="flex items-center">
+        <img
+            src="/static/images/ibio.png"
+            alt="Universidad de los Andes"
+            class="h-[3.9rem] w-auto object-contain">
+    </div>
+
+</header>
+
+
+
+    <!-- ================================================= -->
+    <!-- SIDEBAR -->
+    <!-- ================================================= -->
+
+    <aside
+        id="sidebar"
+        class="fixed left-0 top-16 bottom-0 w-64
+               bg-[#284269] text-white
+               transform -translate-x-full
+               transition-transform duration-300
+               z-50">
+
+        <div class="p-6">
+
+            <div class="flex justify-between items-center mb-8">
+
+                <span
+                    class="text-xs uppercase tracking-widest
+                           text-blue-200">
+
+                    Navigation
+
+                </span>
+
+                <button onclick="toggleSidebar()">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            </div>
+
+
+ <nav class="space-y-2">
+
+    <a
+        href="#home"
+        onclick="toggleSidebar()"
+        class="block px-4 py-3 rounded-lg
+               hover:bg-white/10 transition">
+
+        <i class="fa-solid fa-house mr-3"></i>
+        Home
+
+    </a>
+
+
+    <a
+        href="#why"
+        onclick="toggleSidebar()"
+        class="block px-4 py-3 rounded-lg
+               hover:bg-white/10 transition">
+
+        <i class="fa-solid fa-lightbulb mr-3"></i>
+        Why Microheater Design?
+
+    </a>
+
+
+
+
+    <a
+        href="#how"
+        onclick="toggleSidebar()"
+        class="block px-4 py-3 rounded-lg
+               hover:bg-white/10 transition">
+
+        <i class="fa-solid fa-pen-ruler mr-3"></i>
+         Designer
+
+    </a>
+
+
+    <a
+        href="#team"
+        onclick="toggleSidebar()"
+        class="block px-4 py-3 rounded-lg
+               hover:bg-white/10 transition">
+
+        <i class="fa-solid fa-users mr-3"></i>
+        Team
+
+    </a>
+
+</nav>
+        </div>
+
+    </aside>
+
+
+
+    <!-- ================================================= -->
+    <!-- LANDING PAGE -->
+    <!-- ================================================= -->
+
+    <main id="main-content">
+
+
+        <!-- ================================================= -->
+        <!-- HERO -->
+        <!-- ================================================= -->
+
+        <section
+            id="home"
+            class="min-h-[calc(100vh-4rem)]
+                   flex items-center
+                   px-8 md:px-16 lg:px-24
+                   bg-white">
+
+
+            <div class="max-w-7xl mx-auto w-full">
+
+                <div
+                    class="grid lg:grid-cols-2
+                           gap-16 lg:gap-20
+                           items-center">
+
+
+                    <!-- ===================================== -->
+                    <!-- LEFT: TEXT -->
+                    <!-- ===================================== -->
+
+                    <div>
+
+
+
+
+                                                <!-- Main title -->
+
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl
+                                   font-extrabold leading-[0.95]
+                                   tracking-tight text-[#284269]">
+
+                            Define.
+                            <br>
+
+                            Predict.
+                            <br>
+
+                            <span class="text-[#2E58A6]">
+                                Fabricate.
+                            </span>
+
+                        </h1>
+
+
+
+                        <!-- Description -->
+
+                        <p
+                            class="mt-8
+                                   text-lg
+                                   text-slate-500
+                                   leading-relaxed
+                                   max-w-xl">
+
+                            Enter the desired temperature and the
+                            dimensions of your plate. Microheater Design uses
+                            machine learning to predict the microheater
+                            parameters required to achieve the target
+                            thermal response.
+
+                        </p>
+
+
+
+
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- RIGHT: IMAGE -->
+<!-- ===================================== -->
+
+<div class="relative -mt-1">
+
+
+
+                                                    <div class="flex items-center gap-3 mb-6">
+
+                        
+
+                            <span
+                                class="text-sm font-semibold
+                                       tracking-widest uppercase
+                                       text-[#2E58A6]">
+
+                                From target temperature to microheater design
+
+                            </span>
+
+                        </div>
+
+            
+
+
+                                <img
+                                    src="/static/images/microheater.png"
+                                    alt="Microheater research prototype"
+                                    class="hero-image w-full
+                                        object-contain">
+
+
+                                
+                                                                <!-- Small label -->
+
+
+
+
+                                
+                                
+
+
+
+    
+
+
+
+
+
+                   
+
+                </div>
+
+            </div>
+
+        </section>
+<!-- ============================================= -->
+<!-- WHY Microheater Design -->
+<!-- ============================================= -->
+<section
+    id="why"
+    class="pt-2 pb-24
+           px-8 md:px-16
+           bg-white">
+
+   <style>
+    /* Design process animation */
+    .process-step,
+    .process-arrow,
+    .adjust-process {
+        opacity: 0;
+    }
+
+    .process-step {
+        transform: translateX(-20px);
+    }
+
+    .adjust-process {
+        transform: translateY(10px);
+    }
+
+    /* Animation starts when the section enters the viewport */
+    .why-visible .process-step {
+        animation: processIn 0.7s ease-out forwards;
+    }
+
+    .why-visible .process-step.define {
+        animation-delay: 0.2s;
+    }
+
+    .why-visible .process-step.evaluate {
+        animation-delay: 0.7s;
+    }
+
+    .why-visible .process-step.compare {
+        animation-delay: 1.2s;
+    }
+
+    .why-visible .process-arrow {
+        animation: arrowIn 0.5s ease-out forwards;
+    }
+
+    .why-visible .process-arrow.first {
+        animation-delay: 0.5s;
+    }
+
+    .why-visible .process-arrow.second {
+        animation-delay: 1s;
+    }
+
+    .why-visible .adjust-process {
+        animation: adjustIn 0.6s ease-out forwards;
+        animation-delay: 1.7s;
+    }
+
+    @keyframes processIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes arrowIn {
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes adjustIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    
+</style>
+
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- ============================================= -->
+        <!-- INTRODUCTION -->
+        <!-- ============================================= -->
+        <div class="max-w-5xl mx-auto text-center">
+
+            <span
+                class="text-sm
+                       font-semibold
+                       tracking-widest
+                       uppercase
+                       text-[#2E58A6]">
+                Why Microheater Design?
+            </span>
+
+            <h2
+                class="mt-4
+                       text-4xl md:text-5xl
+                       font-bold
+                       leading-tight
+                       text-[#284269]">
+                Designing a microheater should not start
+                <br class="hidden md:block">
+                with trial and error.
+            </h2>
+
+            <p
+                class="mt-7
+                       text-lg
+                       text-slate-500
+                       leading-relaxed
+                       max-w-3xl
+                       mx-auto">
+                Microheater performance depends strongly on its geometry
+                and operating conditions. Finding a suitable design can
+                require repeated simulations, parameter adjustments,
+                and testing.
+            </p>
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- DESIGN PROCESS -->
+        <!-- ============================================= -->
+        <div
+            class="mt-16
+                   max-w-6xl
+                   mx-auto">
+
+            <div
+                class="flex
+                       flex-col
+                       md:flex-row
+                       items-center
+                       justify-between
+                       gap-6">
+
+
+                <!-- DEFINE -->
+                <div
+                    class="flex-1
+                           text-center
+                           process-step
+                           define">
+
+                    <div
+                        class="w-14 h-14
+                               mx-auto
+                               flex items-center justify-center
+                               rounded-full
+                               bg-slate-100
+                               text-[#2E58A6]">
+
+                        <i class="fa-solid fa-pen-ruler text-xl"></i>
+
+                    </div>
+
+                    <h3
+                        class="mt-5
+                               text-xl
+                               font-bold
+                               text-[#284269]">
+                        Define
+                    </h3>
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-slate-500
+                               leading-relaxed">
+                        Define the microheater geometry.
+                    </p>
+
+                </div>
+
+
+                <!-- ARROW 1 -->
+                <div
+                    class="process-arrow
+                           first
+                           hidden md:block
+                           text-slate-300">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+
+                <!-- EVALUATE -->
+                <div
+                    class="flex-1
+                           text-center
+                           process-step
+                           evaluate">
+
+                    <div
+                        class="w-14 h-14
+                               mx-auto
+                               flex items-center justify-center
+                               rounded-full
+                               bg-slate-100
+                               text-[#2E58A6]">
+
+                        <i class="fa-solid fa-flask-vial text-xl"></i>
+
+                    </div>
+
+                    <h3
+                        class="mt-5
+                               text-xl
+                               font-bold
+                               text-[#284269]">
+                        Evaluate
+                    </h3>
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-slate-500
+                               leading-relaxed">
+                        Simulate or test its thermal response.
+                    </p>
+
+                </div>
+
+
+                <!-- ARROW 2 -->
+                <div
+                    class="process-arrow
+                           second
+                           hidden md:block
+                           text-slate-300">
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </div>
+
+
+                <!-- COMPARE -->
+                <div
+                    class="flex-1
+                           text-center
+                           process-step
+                           compare">
+
+                    <div
+                        class="w-14 h-14
+                               mx-auto
+                               flex items-center justify-center
+                               rounded-full
+                               bg-slate-100
+                               text-[#2E58A6]">
+
+                        <i class="fa-solid fa-temperature-half text-xl"></i>
+
+                    </div>
+
+                    <h3
+                        class="mt-5
+                               text-xl
+                               font-bold
+                               text-[#284269]">
+                        Compare
+                    </h3>
+
+                    <p
+                        class="mt-2
+                               text-sm
+                               text-slate-500
+                               leading-relaxed">
+                        Check whether the target temperature is reached.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- ============================================= -->
+            <!-- ADJUST / REPEAT -->
+            <!-- ============================================= -->
+            <div
+                class="mt-12
+                       flex
+                       flex-col
+                       items-center
+                       adjust-process">
+
+                <div
+                    class="text-[#2E58A6]
+                           mb-3">
+
+                    <i class="fa-solid fa-arrow-turn-up text-lg"></i>
+
+                </div>
+
+                <div
+                    class="flex
+                           items-center
+                           gap-3
+                           text-sm
+                           text-slate-500
+                           text-center">
+
+                    <i
+                        class="fa-solid fa-rotate-left
+                               text-[#2E58A6]">
+                    </i>
+
+                    <span>
+                        If the target is not reached,
+                        adjust the design and repeat.
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ============================================= -->
+        <!-- INVERSE DESIGN -->
+        <!-- ============================================= -->
+        <div
+            class="mt-20
+                   max-w-4xl
+                   mx-auto
+                   text-center">
+
+            <p
+                class="text-2xl md:text-3xl
+                       font-semibold
+                       leading-relaxed
+                       text-[#284269]">
+
+                Microheater Design approaches this problem
+                <span class="text-[#2E58A6]">
+                    in reverse.
+                </span>
+
+            </p>
+
+            <p
+                class="mt-5
+                       text-lg
+                       text-slate-500
+                       leading-relaxed">
+
+                Instead of starting with a geometry and asking what
+                temperature it will produce, the system starts with the
+                desired thermal response and predicts a suitable
+                microheater design.
+
+            </p>
+
+        </div>
+
+    </div>
+</section>
+
+<!-- ================================================= -->
+<!-- HOW IT WORKS -->
+<!-- ================================================= -->
+
+<section
+    id="how"
+    class="py-8
+           px-8 md:px-16
+           bg-white
+           border-slate-200">
+
+    <div class="max-w-7xl mx-auto">
+
+
+        <!-- ============================================= -->
+        <!-- SECTION HEADING -->
+        <!-- ============================================= -->
+
+        <div class="mb-14 text-center">
+
+            <span
+                class="text-sm
+                       font-semibold
+                       tracking-widest
+                       uppercase
+                       text-[#2E58A6]">
+
+                Workflow
+
+            </span>
+
+
+            <h2
+                class="mt-3
+                       text-4xl
+                       font-bold
+                       text-[#284269]">
+
+                From parameters to fabrication.
+
+            </h2>
+
+
+        </div>
+
+        <!-- ============================================= -->
+<!-- WORKFLOW + DESIGN PREVIEW -->
+<!-- ============================================= -->
+
+<div
+    class="grid
+           lg:grid-cols-2
+           gap-0
+           items-stretch">
+
+
+    <!-- ========================================= -->
+    <!-- LEFT: WORKFLOW -->
+    <!-- ========================================= -->
+
+    <div
+        class="lg:border-r
+           lg:border-slate-200
+           lg:pr-12
+           overflow-hidden">
+
+
+        <!-- STEP 1 -->
+
+        <div
+            class="p-7
+                   border-b
+                   border-slate-200
+                   flex
+                   gap-6">
+
+            <span
+                class="text-3xl
+                       font-bold
+                       text-[#8BA8D1]
+                       leading-none">
+
+                01
+
+            </span>
+
+
+            <div>
+
+                <h3
+                    class="font-bold
+                           text-lg
+                           text-[#284269]">
+
+                    Input
+
+                </h3>
+
+
+                <p
+                    class="mt-2
+                           text-sm
+                           text-slate-500
+                           leading-relaxed">
+
+                    Define the target temperature and
+                    physical dimensions of the plate.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 2 -->
+
+        <div
+            class="p-7
+                   border-b
+                   border-slate-200
+                   flex
+                   gap-6">
+
+            <span
+                class="text-3xl
+                       font-bold
+                       text-[#8BA8D1]
+                       leading-none">
+
+                02
+
+            </span>
+
+
+            <div>
+
+                <h3
+                    class="font-bold
+                           text-lg
+                           text-[#284269]">
+
+                    Design
+
+                </h3>
+
+
+                <p
+                    class="mt-2
+                           text-sm
+                           text-slate-500
+                           leading-relaxed">
+
+                    The system determines the
+                    microheater geometry for the target.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 3 -->
+
+        <div
+            class="p-7
+                   border-b
+                   border-slate-200
+                   flex
+                   gap-6">
+
+            <span
+                class="text-3xl
+                       font-bold
+                       text-[#8BA8D1]
+                       leading-none">
+
+                03
+
+            </span>
+
+
+            <div>
+
+                <h3
+                    class="font-bold
+                           text-lg
+                           text-[#284269]">
+
+                    Predict
+
+                </h3>
+
+
+                <p
+                    class="mt-2
+                           text-sm
+                           text-slate-500
+                           leading-relaxed">
+
+                    The machine learning model predicts the microheater geometry required to achieve the target temperature.
+
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- STEP 4 -->
+
+        <div
+            class="p-7
+                   flex
+                   gap-6">
+
+            <span
+                class="text-3xl
+                       font-bold
+                       text-[#8BA8D1]
+                       leading-none">
+
+                04
+
+            </span>
+
+
+            <div>
+
+                <h3
+                    class="font-bold
+                           text-lg
+                           text-[#284269]">
+
+                    Export
+
+                </h3>
+
+
+                <p
+                    class="mt-2
+                           text-sm
+                           text-slate-500
+                           leading-relaxed">
+
+                    Export the generated geometry in different file formats for fabrication and simulation.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ========================================= -->
+    <!-- RIGHT: DESIGN PREVIEW -->
+    <!-- ========================================= -->
+
+    <div
+    class="lg:pl-12
+           p-8
+           lg:pt-12
+           flex
+           flex-col">
+
+
+        <!-- Preview header -->
+
+        <div>
+
+
+            <h3
+                class="mt-2
+                       text-xl
+                       font-bold
+                       text-[#284269]">
+
+                Define your target
+
+            </h3>
+
+        </div>
+
+
+
+        <!-- Parameters -->
+
+        <div class="mt-7 space-y-5">
+
+
+            <!-- Temperature -->
+
+            <div>
+
+                <label
+                    class="block
+                           text-sm
+                           font-medium
+                           text-[#284269]
+                           mb-2">
+
+                    Target temperature
+
+                </label>
+
+
+                <div
+                    class="flex
+                           items-center
+                           justify-between
+                           border
+                           border-slate-200
+                           rounded-lg
+                           px-4
+                           py-3">
+
+                    <span class="text-slate-700">
+                        80
+                    </span>
+
+                    <span class="text-sm text-slate-400">
+                        °C
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- Plate dimensions -->
+
+            <div>
+
+                <label
+                    class="block
+                           text-sm
+                           font-medium
+                           text-[#284269]
+                           mb-2">
+
+                    Plate dimensions
+
+                </label>
+
+
+                <div
+                    class="grid
+                           grid-cols-2
+                           gap-3">
+
+
+                    <div
+                        class="border
+                               border-slate-200
+                               rounded-lg
+                               px-4
+                               py-3">
+
+                        <span class="text-xs text-slate-400">
+                            X
+                        </span>
+
+                        <div class="mt-1 text-slate-700">
+                            50 mm
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="border
+                               border-slate-200
+                               rounded-lg
+                               px-4
+                               py-3">
+
+                        <span class="text-xs text-slate-400">
+                            Y
+                        </span>
+
+                        <div class="mt-1 text-slate-700">
+                            50 mm
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+<!-- ========================================= -->
+<!-- PREDICTED CURRENT -->
+<!-- ========================================= -->
+
+<div
+    class="mt-7
+        
+           pt-4
+           pb-4
+           border-t
+           border-b
+           border-slate-200
+           flex
+           items-center
+           justify-between">
+
+    <span
+        class="text-sm
+               font-semibold
+               tracking-widest
+               uppercase
+               text-[#8BA8D1]">
+
+        Predicted current
+
+    </span>
+
+
+    <span
+        class="text-lg
+               font-bold
+               text-[#284269]">
+
+        1.24 A
+
+    </span>
+
+</div>
+
+
+
+        <!-- ========================================= -->
+        <!-- EXPORT -->
+        <!-- ========================================= -->
+
+        <div class="mt-6">
+
+            <span
+                class="text-sm
+                       font-semibold
+                       tracking-widest
+                       uppercase
+                       text-[#8BA8D1]">
+
+                Export geometry
+
+            </span>
+
+
+            <div
+                class="mt-3
+                       grid
+                       grid-cols-3
+                       gap-3">
+
+
+                <!-- COMSOL -->
+
+                <button
+                    class="py-3
+                           border
+                           border-slate-200
+                           rounded-lg
+                           text-sm
+                           font-medium
+                           text-[#284269]
+                           hover:bg-slate-50">
+
+                    COMSOL
+
+                </button>
+
+
+                <!-- CAD -->
+
+                <button
+                    class="py-3
+                           border
+                           border-slate-200
+                           rounded-lg
+                           text-sm
+                           font-medium
+                           text-[#284269]
+                           hover:bg-slate-50">
+
+                    CAD
+
+                </button>
+
+
+                <!-- ALTIUM -->
+
+                <button
+                    class="py-3
+                           border
+                           border-slate-200
+                           rounded-lg
+                           text-sm
+                           font-medium
+                           text-[#284269]
+                           hover:bg-slate-50">
+
+                    Altium
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- TEAM -->
+<section
+    id="team"
+    class="relative min-h-[720px]
+           py-24
+           px-8 md:px-16
+           bg-white
+           border-b border-slate-200
+           overflow-hidden">
+
+    <div
+        class="max-w-7xl mx-auto
+               min-h-[570px]
+               grid
+               lg:grid-cols-[0.9fr_1.1fr]
+               items-center">
+
+        <!-- LEFT: TEAM INFORMATION -->
+        <div
+            class="relative z-20
+                   max-w-xl
+                   pr-8 lg:pr-12">
+
+            <span
+                class="text-sm
+                       font-semibold
+                       tracking-widest
+                       uppercase
+                       text-[#8BA8D1]">
+                Team members
+            </span>
+
+            <h2
+                class="mt-4
+                       text-5xl md:text-6xl
+                       font-bold
+                       leading-[0.95]
+                       tracking-tight
+                       text-[#284269]">
+                The people<br>
+                behind <span class="text-[#2E58A6]">Microheater Design.</span>
+            </h2>
+
+            <p
+                class="mt-7
+                       max-w-md
+                       text-base
+                       text-slate-500
+                       leading-relaxed">
+                Eight team members combining engineering,
+                software development, machine learning,
+                and experimental validation.
+            </p>
+
+        
+        <!-- TEAM MEMBERS -->
+        <div
+            class="mt-10
+                grid
+                sm:grid-cols-2
+                gap-x-8
+                gap-y-5">
+
+            <!-- MEMBER 01 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        David S.Rodríguez
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:ds.rodriguezq1@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/david-santiago-rodr%C3%ADguez-quiroga-249670312/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 02 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Ana S. Español
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:a.espanol@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/ana-sofia-espa%C3%B1ol/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 03 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Ana S. Acosta
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:as.acosta@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/ana-sofia-acosta-valencia-14131a210/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 04 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Carol D. Vergara
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:c.vergaraa@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/carol-dayanna-vergara-amaya-109b17311/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 05 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Daniela Martínez
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:d.martinezm2@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/daniela-martinez-a2608b266/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 06 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Laura Muñoz
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:l.munoze@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/laura-valentina-mu%C3%B1oz-estevez/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 07 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Cristian F. Rodríguez
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:cf.rodriguez@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/cristian-felipe-rodriguez-ospino/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- MEMBER 08 -->
+            <div class="flex items-start gap-3">
+                <div>
+                    <p class="font-semibold text-[#284269] text-center">
+                        Juan C. Cruz
+                    </p>
+
+                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
+                        <a
+                            href="mailto:jc.cruz@uniandes.edu.co"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="Email">
+                            <i class="fa-regular fa-envelope"></i>
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/juan-c-cruz-ph-d-p-e-91b475298/"
+                            target="_blank"
+                            rel="noopener"
+                            class="hover:text-[#2E58A6] transition"
+                            aria-label="LinkedIn">
+                            <i class="fa-brands fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>      
+
+
+        <!-- RIGHT: DRIFT WALL -->
+        <div
+            class="team-wall
+                   relative
+                   h-[570px]
+                   -mr-2
+                   lg:-mr-12">
+
+            <!-- PHOTO WALL -->
+            <div
+                class="absolute inset-8
+                       grid
+                       grid-cols-4
+                       gap-6
+                       items-center
+                       [transform:perspective(900px)_rotateY(-8deg)]">
+
+                <!-- PHOTO 01 -->
+                <div class="team-photo photo-1">
+                    <img
+                        src="/static/images/team/member1.jpg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 02 -->
+                <div class="team-photo photo-2 mt-12">
+                    <img
+                        src="/static/images/team/member2.png"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 03 -->
+                <div class="team-photo photo-3 -mt-10">
+                    <img
+                        src="/static/images/team/member3.jpg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 04 -->
+                <div class="team-photo photo-4 mt-8">
+                    <img
+                        src="/static/images/team/member4.jpg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 05 -->
+                <div class="team-photo photo-5 -mt-6">
+                    <img
+                        src="/static/images/team/member5.jpg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 06 -->
+                <div class="team-photo photo-6 mt-14">
+                    <img
+                        src="/static/images/team/member6.jpeg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 07 -->
+                <div class="team-photo photo-7 -mt-8">
+                    <img
+                        src="/static/images/team/member7.png"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+                <!-- PHOTO 08 -->
+                <div class="team-photo photo-8 mt-6">
+                    <img
+                        src="/static/images/team/member8.jpg"
+                        alt="Team member"
+                        class="w-full h-full object-cover">
+                </div>
+
+            </div>
+
+
+            <!-- FADE TO WHITE: TOP -->
+            <div
+                class="absolute inset-x-0 top-3
+                       h-24
+                       z-10
+                       pointer-events-none
+                       bg-gradient-to-b
+                       from-white
+                       to-transparent">
+            </div>
+
+
+
+        </div>
+
+    </div>
+</section>
+
+    <!-- ================================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================================= -->
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar = document.getElementById("sidebar");
+
+            sidebar.classList.toggle("-translate-x-full");
+
+        }
+
+    </script>
+<script>
+    const whySection = document.getElementById('why');
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    whySection.classList.add('why-visible');
+                    observer.unobserve(whySection);
+                }
+            });
+        },
+        {
+            threshold: 0.25
+        }
+    );
+
+    observer.observe(whySection);
+</script>
+
+<script>
+    const header = document.getElementById('main-header');
+
+    let lastScrollY = window.scrollY;
+
+    window.addEventListener('scroll', () => {
+
+        const currentScrollY = window.scrollY;
+
+        if (currentScrollY <= 10) {
+            // At the top
+            header.classList.remove('-translate-y-full');
+
+        } else if (currentScrollY > lastScrollY) {
+            // Scrolling down
+            header.classList.add('-translate-y-full');
+
+        } else {
+            // Scrolling up
+            header.classList.remove('-translate-y-full');
+        }
+
+        lastScrollY = currentScrollY;
+    });
+</script>
+</body>
+
+</html>
