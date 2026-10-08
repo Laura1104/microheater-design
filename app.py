@@ -32,7 +32,7 @@ def generar_cad():
       n += 1
 
     nombre_dxf = 'serpentin_generado.dxf'
-    ruta_salida = os.path.join(app.root_path, nombre_dxf)
+    ruta_salida = os.path.join('/tmp', nombre_dxf)
 
     generar_serpentin_real(
         x_length=x_length,
@@ -61,7 +61,7 @@ def generar_cad():
 
 @app.route('/descargar_cad', methods=['GET'])
 def descargar_cad():
-  ruta_salida = os.path.join(app.root_path, 'serpentin_generado.dxf')
+  ruta_salida = os.path.join('/tmp', 'serpentin_generado.dxf')
   if os.path.exists(ruta_salida):
     return send_file(
         ruta_salida,
@@ -97,7 +97,7 @@ def generar_gerber():
         dpads=3.0,
         hpads=3.0,
         dist_entre_pads=5.0,
-        carpeta_salida=app.root_path,
+        carpeta_salida='/tmp',
         nombre_base='serpentin_disenado',
     )
 
@@ -115,7 +115,7 @@ def generar_gerber():
 
 @app.route('/descargar_gerber', methods=['GET'])
 def descargar_gerber():
-  ruta_zip = os.path.join(app.root_path, 'serpentin_disenado_gerber.zip')
+  ruta_zip = os.path.join('/tmp', 'serpentin_disenado_gerber.zip')
   if os.path.exists(ruta_zip):
     return send_file(
         ruta_zip,
