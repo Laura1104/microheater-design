@@ -129,7 +129,17 @@ def descargar_gerber():
 # ==========================================
 @app.route('/generar_comsol', methods=['POST'])
 def generar_comsol():
+
+  # Vercel no puede ejecutar COMSOL
+  if os.environ.get('VERCEL'):
+    return jsonify({
+        'status': 'error',
+        'mensaje': 'La generación de COMSOL está disponible únicamente en la versión local.'
+    }), 501
+
   try:
+    global ultimo_comsol
+
     data = request.get_json() or {}
 
     x_length = float(data.get('x_length', 30.0))
@@ -140,15 +150,13 @@ def generar_comsol():
     if n % 2 != 0:
       n += 1
 
-    global ultimo_comsol
     nombre_mph = f'serpentin_disenado_{uuid.uuid4().hex[:8]}.mph'
     ruta_salida = os.path.join(app.root_path, nombre_mph)
 
     ultimo_comsol = nombre_mph
 
-    from generador_comsol import generar_serpentin_comsol
+    from comsol.generador_comsol import generar_serpentin_comsol
 
-    # Generación directa
     generar_serpentin_comsol(
         x_length=x_length,
         y_length=y_length,
@@ -171,12 +179,15 @@ def generar_comsol():
     })
 
   except Exception as e:
-    # Mostramos el error real en la alerta de la interfaz web
-    return jsonify({'status': 'error', 'mensaje': f'Error COMSOL: {str(e)}'}), 400
-  
-  
+    return jsonify({
+        'status': 'error',
+        'mensaje': f'Error COMSOL: {str(e)}'
+    }), 400
+
+
 @app.route('/descargar_comsol', methods=['GET'])
 def descargar_comsol():
+
   if ultimo_comsol:
     ruta_mph = os.path.join(app.root_path, ultimo_comsol)
 

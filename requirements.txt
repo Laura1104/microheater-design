@@ -1,8 +1,2 @@
 Flask
-numpy
-pandas
-joblib
-tensorflow
-scipy
 ezdxf
-gunicorn
