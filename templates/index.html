@@ -1066,267 +1066,89 @@
 
 
 
-    <!-- ========================================= -->
-    <!-- RIGHT: DESIGN PREVIEW -->
-    <!-- ========================================= -->
+<!-- ========================================= -->
+<!-- RIGHT: DESIGN PREVIEW -->
+<!-- ========================================= -->
 
-    <div
-    class="lg:pl-12
-           p-8
-           lg:pt-12
-           flex
-           flex-col">
+<div class="lg:pl-12 p-8 lg:pt-12 flex flex-col">
 
+    <!-- Preview header -->
+    <div>
+        <h3 class="mt-2 text-xl font-bold text-[#284269]">
+            Define your target
+        </h3>
+    </div>
 
-        <!-- Preview header -->
+    <!-- Parameters -->
+    <div class="mt-7 space-y-5">
 
+        <!-- Temperature -->
         <div>
-
-
-            <h3
-                class="mt-2
-                       text-xl
-                       font-bold
-                       text-[#284269]">
-
-                Define your target
-
-            </h3>
-
+            <label class="block text-sm font-medium text-[#284269] mb-2">
+                Target temperature
+            </label>
+            <div class="flex items-center justify-between border border-slate-200 rounded-lg px-4 py-2 bg-white">
+                <input type="number" id="temp_objetivo" value="45" step="0.1" class="w-full outline-none text-slate-700 bg-transparent">
+                <span class="text-sm text-slate-400 ml-2">°C</span>
+            </div>
         </div>
 
-
-
-        <!-- Parameters -->
-
-        <div class="mt-7 space-y-5">
-
-
-            <!-- Temperature -->
-
-            <div>
-
-                <label
-                    class="block
-                           text-sm
-                           font-medium
-                           text-[#284269]
-                           mb-2">
-
-                    Target temperature
-
-                </label>
-
-
-                <div
-                    class="flex
-                           items-center
-                           justify-between
-                           border
-                           border-slate-200
-                           rounded-lg
-                           px-4
-                           py-3">
-
-                    <span class="text-slate-700">
-                        80
-                    </span>
-
-                    <span class="text-sm text-slate-400">
-                        °C
-                    </span>
-
+        <!-- Plate dimensions -->
+        <div>
+            <label class="block text-sm font-medium text-[#284269] mb-2">
+                Plate dimensions
+            </label>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
+                    <span class="text-xs text-slate-400 block">X (mm)</span>
+                    <input type="number" id="x_length" value="30.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
                 </div>
 
-            </div>
-
-
-
-            <!-- Plate dimensions -->
-
-            <div>
-
-                <label
-                    class="block
-                           text-sm
-                           font-medium
-                           text-[#284269]
-                           mb-2">
-
-                    Plate dimensions
-
-                </label>
-
-
-                <div
-                    class="grid
-                           grid-cols-2
-                           gap-3">
-
-
-                    <div
-                        class="border
-                               border-slate-200
-                               rounded-lg
-                               px-4
-                               py-3">
-
-                        <span class="text-xs text-slate-400">
-                            X
-                        </span>
-
-                        <div class="mt-1 text-slate-700">
-                            50 mm
-                        </div>
-
-                    </div>
-
-
-                    <div
-                        class="border
-                               border-slate-200
-                               rounded-lg
-                               px-4
-                               py-3">
-
-                        <span class="text-xs text-slate-400">
-                            Y
-                        </span>
-
-                        <div class="mt-1 text-slate-700">
-                            50 mm
-                        </div>
-
-                    </div>
-
+                <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
+                    <span class="text-xs text-slate-400 block">Y (mm)</span>
+                    <input type="number" id="y_length" value="35.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
                 </div>
-
             </div>
-
         </div>
 
-<!-- ========================================= -->
-<!-- PREDICTED CURRENT -->
-<!-- ========================================= -->
-
-<div
-    class="mt-7
-        
-           pt-4
-           pb-4
-           border-t
-           border-b
-           border-slate-200
-           flex
-           items-center
-           justify-between">
-
-    <span
-        class="text-sm
-               font-semibold
-               tracking-widest
-               uppercase
-               text-[#8BA8D1]">
-
-        Predicted current
-
-    </span>
-
-
-    <span
-        class="text-lg
-               font-bold
-               text-[#284269]">
-
-        1.24 A
-
-    </span>
-
-</div>
-
-
-
-        <!-- ========================================= -->
-        <!-- EXPORT -->
-        <!-- ========================================= -->
-
-        <div class="mt-6">
-
-            <span
-                class="text-sm
-                       font-semibold
-                       tracking-widest
-                       uppercase
-                       text-[#8BA8D1]">
-
-                Export geometry
-
-            </span>
-
-
-            <div
-                class="mt-3
-                       grid
-                       grid-cols-3
-                       gap-3">
-
-
-                <!-- COMSOL -->
-
-                <button
-                    class="py-3
-                           border
-                           border-slate-200
-                           rounded-lg
-                           text-sm
-                           font-medium
-                           text-[#284269]
-                           hover:bg-slate-50">
-
-                    COMSOL
-
-                </button>
-
-
-                <!-- CAD -->
-
-                <button
-                    class="py-3
-                           border
-                           border-slate-200
-                           rounded-lg
-                           text-sm
-                           font-medium
-                           text-[#284269]
-                           hover:bg-slate-50">
-
-                    CAD
-
-                </button>
-
-
-                <!-- ALTIUM -->
-
-                <button
-                    class="py-3
-                           border
-                           border-slate-200
-                           rounded-lg
-                           text-sm
-                           font-medium
-                           text-[#284269]
-                           hover:bg-slate-50">
-
-                    Altium
-
-                </button>
-
+        <!-- Additional Parameters -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
+                <span class="text-xs text-slate-400 block">Vueltas (n)</span>
+                <input type="number" id="n" value="6" step="2" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
             </div>
 
+            <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
+                <span class="text-xs text-slate-400 block">Espaciado lz (mm)</span>
+                <input type="number" id="lz" value="3.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
+            </div>
         </div>
+
 
     </div>
 
+<!-- EXPORT (Generan y descargan directamente) -->
+    <div class="mt-6">
+        <span class="text-sm font-semibold tracking-widest uppercase text-[#8BA8D1]">
+            Export geometry
+        </span>
+
+        <div class="mt-3 grid grid-cols-3 gap-3">
+            <button onclick="generarYDescargar('comsol')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
+                COMSOL (.MPH)
+            </button>
+
+            <button onclick="generarYDescargar('cad')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
+                CAD (.DXF)
+            </button>
+
+            <button onclick="generarYDescargar('gerber')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
+                Gerber (PCB)
+            </button>
+        </div>
+    </div>
+
+</div>
 </div>
 <!-- TEAM -->
 <section
@@ -1722,66 +1544,100 @@
     </div>
 </section>
 
-    <!-- ================================================= -->
+ <!-- ================================================= -->
     <!-- JAVASCRIPT -->
     <!-- ================================================= -->
 
     <script>
-
+        // 1. Control del Sidebar
         function toggleSidebar() {
-
             const sidebar = document.getElementById("sidebar");
-
             sidebar.classList.toggle("-translate-x-full");
-
         }
 
-    </script>
-<script>
-    const whySection = document.getElementById('why');
+        // 2. Generación y Descarga de Archivos (CAD, COMSOL, Altium)
+async function generarYDescargar(formato) {
+    const tempElem = document.getElementById('temp_objetivo');
+    const xElem = document.getElementById('x_length');
+    const yElem = document.getElementById('y_length');
+    const nElem = document.getElementById('n');
+    const lzElem = document.getElementById('lz');
 
-    const observer = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    whySection.classList.add('why-visible');
-                    observer.unobserve(whySection);
-                }
-            });
-        },
-        {
-            threshold: 0.25
-        }
-    );
+    const data = {
+        temp_objetivo: tempElem ? parseFloat(tempElem.value) : 45.0,
+        x_length: xElem ? parseFloat(xElem.value) : 30.0,
+        y_length: yElem ? parseFloat(yElem.value) : 35.0,
+        n: nElem ? parseInt(nElem.value) : 6,
+        lz: lzElem ? parseFloat(lzElem.value) : 3.0
+    };
 
-    observer.observe(whySection);
-</script>
+    const endpoint = `/generar_${formato}`;
 
-<script>
-    const header = document.getElementById('main-header');
+    try {
+        const resp = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
 
-    let lastScrollY = window.scrollY;
+        const res = await resp.json();
 
-    window.addEventListener('scroll', () => {
+        if (resp.ok && res.status === 'ok') {
+            // Actualizamos el texto de la corriente si el elemento existe
+            const corrienteElem = document.getElementById('corrienteRes');
+            if (corrienteElem) {
+                corrienteElem.innerText = (res.corriente || "0.35") + " A";
+            }
 
-        const currentScrollY = window.scrollY;
-
-        if (currentScrollY <= 10) {
-            // At the top
-            header.classList.remove('-translate-y-full');
-
-        } else if (currentScrollY > lastScrollY) {
-            // Scrolling down
-            header.classList.add('-translate-y-full');
-
+            // Descarga directa abriendo la URL del endpoint
+            if (res.descarga_url) {
+                window.location.href = res.descarga_url;
+            }
         } else {
-            // Scrolling up
-            header.classList.remove('-translate-y-full');
+            alert('Error en el servidor: ' + (res.mensaje || 'Respuesta no válida.'));
+        }
+    } catch (error) {
+        console.error("Detalle del error en JS:", error);
+        alert("Ocurrió un error en la interfaz. Revisa la consola del navegador (F12).");
+    }
+}
+
+        // 3. Animación de Scroll para la sección 'Why'
+        const whySection = document.getElementById('why');
+        if (whySection) {
+            const observer = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            whySection.classList.add('why-visible');
+                            observer.unobserve(whySection);
+                        }
+                    });
+                },
+                { threshold: 0.25 }
+            );
+            observer.observe(whySection);
         }
 
-        lastScrollY = currentScrollY;
-    });
-</script>
-</body>
+        // 4. Comportamiento del Header al hacer Scroll
+        const header = document.getElementById('main-header');
+        if (header) {
+            let lastScrollY = window.scrollY;
 
+            window.addEventListener('scroll', () => {
+                const currentScrollY = window.scrollY;
+
+                if (currentScrollY <= 10) {
+                    header.classList.remove('-translate-y-full');
+                } else if (currentScrollY > lastScrollY) {
+                    header.classList.add('-translate-y-full');
+                } else {
+                    header.classList.remove('-translate-y-full');
+                }
+
+                lastScrollY = currentScrollY;
+            });
+        }
+    </script>
+</body>
 </html>
