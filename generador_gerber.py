@@ -1,8 +1,8 @@
 """
-serpentin_a_gerber.py
+microheater_a_gerber.py
 ------------------------
-Genera el MISMO serpentín que serpentin_comsol_real.py (DXF) y
-serpentin_a_comsol.py (COMSOL), con las mismas fórmulas, pero como
+Genera el MISMO serpentín que microheater_comsol_real.py (DXF) y
+microheater_a_comsol.py (COMSOL), con las mismas fórmulas, pero como
 archivos GERBER (formato RS-274X), el estándar que usan las
 fabricantes de PCB. Este mismo Gerber se puede abrir/importar en
 Altium (y en KiCad, etc.), por eso no hace falta un script aparte
@@ -43,7 +43,7 @@ import os
 import zipfile
 
 
-def generar_serpentin_gerber(
+def generar_microheater_gerber(
     x_length: float,
     y_length: float,
     lz: float,
@@ -54,12 +54,12 @@ def generar_serpentin_gerber(
     hpads: float = 3.0,
     dist_entre_pads: float = 5.0,
     carpeta_salida: str = ".",
-    nombre_base: str = "serpentin",
+    nombre_base: str = "microheater",
 ):
     """
     Genera los archivos Gerber del serpentín.
 
-    Mismos parámetros y mismas fórmulas que generar_serpentin_real()
+    Mismos parámetros y mismas fórmulas que generar_microheater_real()
     (el de DXF) -- ver ese archivo para el detalle de cada fórmula.
     Retorna un dict con las rutas de los archivos y los valores
     calculados.
@@ -225,7 +225,7 @@ def generar_serpentin_gerber(
 
     # --- Armar el archivo de cobre ---
     lineas_cobre = [
-        "G04 Serpentin - capa de cobre superior (generado por serpentin_a_gerber.py)*",
+        "G04 microheater - capa de cobre superior (generado por microheater_a_gerber.py)*",
         "%MOMM*%",
         "%FSLAX46Y46*%",
         "%TF.FileFunction,Copper,L1,Top*%",
@@ -247,7 +247,7 @@ def generar_serpentin_gerber(
     xa, xb = -x_length / 2, x_length / 2
     ya, yb = y0, y0 + y_length
     lineas_contorno = [
-        "G04 Serpentin - contorno de la placa (generado por serpentin_a_gerber.py)*",
+        "G04 microheater - contorno de la placa (generado por microheater_a_gerber.py)*",
         "%MOMM*%",
         "%FSLAX46Y46*%",
         "%TF.FileFunction,Profile,NP*%",
@@ -311,7 +311,7 @@ def main():
     DIST_ENTRE_PADS = 5.0
 
     try:
-        info = generar_serpentin_gerber(
+        info = generar_microheater_gerber(
             x_length=X_LENGTH,
             y_length=Y_LENGTH,
             lz=LZ,
@@ -321,7 +321,7 @@ def main():
             dpads=DPADS,
             hpads=HPADS,
             dist_entre_pads=DIST_ENTRE_PADS,
-            nombre_base="serpentin",
+            nombre_base="microheater",
         )
         print("\n¡Listo! Archivos Gerber guardados en:")
         print(f"  Cobre:    {info['ruta_cobre']}")

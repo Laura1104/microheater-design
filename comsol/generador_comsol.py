@@ -1,7 +1,7 @@
 """
-serpentin_a_comsol.py
+microheater_a_comsol.py
 ------------------------
-Construye el MISMO serpentín que serpentin_comsol_real.py (pasos 1-9,
+Construye el MISMO serpentín que microheater_comsol_real.py (pasos 1-9,
 mismas fórmulas), pero en vez de dibujar un DXF, le da las órdenes a
 COMSOL mismo para que él arme la geometría -- y al final guarda un
 archivo .mph real.
@@ -44,7 +44,7 @@ CORRESPONDENCIA CON LOS PASOS (igual que en el script de DXF):
 import os
 
 
-def generar_serpentin_comsol(
+def generar_microheater_comsol(
     x_length: float,
     y_length: float,
     lz: float,
@@ -54,12 +54,12 @@ def generar_serpentin_comsol(
     dpads: float = 3.0,
     hpads: float = 3.0,
     dist_entre_pads: float = 5.0,
-    nombre_archivo: str = "serpentin.mph",
+    nombre_archivo: str = "microheater.mph",
 ):
     """
     Construye el serpentín directo en COMSOL y guarda el .mph.
 
-    Mismos parámetros y mismas fórmulas que generar_serpentin_real()
+    Mismos parámetros y mismas fórmulas que generar_microheater_real()
     (el de DXF) -- ver ese archivo para el detalle de cada fórmula.
     Retorna un dict con los valores calculados, igual que la versión DXF.
     """
@@ -111,7 +111,7 @@ def generar_serpentin_comsol(
     # Limpiar modelos anteriores de esta sesión
     client.clear()
 
-    model = client.create("Serpentin")
+    model = client.create("microheater")
 
     # Un componente, una geometría 2D
     model.java.component().create("comp1", True)
@@ -251,7 +251,7 @@ def main():
     DIST_ENTRE_PADS = 5.0
 
     try:
-        info = generar_serpentin_comsol(
+        info = generar_microheater_comsol(
             x_length=X_LENGTH,
             y_length=Y_LENGTH,
             lz=LZ,
@@ -261,7 +261,7 @@ def main():
             dpads=DPADS,
             hpads=HPADS,
             dist_entre_pads=DIST_ENTRE_PADS,
-            nombre_archivo="serpentin.mph",
+            nombre_archivo="microheater.mph",
         )
         print("\n¡Listo! Archivo .mph guardado en:")
         print(f"  {info['ruta_absoluta']}")

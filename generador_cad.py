@@ -57,7 +57,7 @@ import os
 import ezdxf
 
 
-def generar_serpentin_real(
+def generar_microheater_real(
     x_length: float,
     y_length: float,
     lz: float,
@@ -67,7 +67,7 @@ def generar_serpentin_real(
     dpads: float = 3.0,
     hpads: float = 3.0,
     dist_entre_pads: float = 5.0,
-    nombre_archivo: str = "serpentin_real.dxf",
+    nombre_archivo: str = "microheater_real.dxf",
 ):
     """
     Construye el serpentín (pasos 1-9) y lo exporta a DXF.
@@ -180,7 +180,7 @@ def generar_serpentin_real(
 
         if not es_terminal:
             # Dedo normal: de -ly/2 a +ly/2 (paso 1)
-            add_rect_centrado(cx, 0, grosor, ly, "SERPENTIN")
+            add_rect_centrado(cx, 0, grosor, ly, "microheater")
         else:
             # Averiguar de qué lado está la punta LIBRE de este dedo terminal
             if i == 0:
@@ -205,7 +205,7 @@ def generar_serpentin_real(
 
             alto_total = y_max - y_min
             cy = (y_max + y_min) / 2
-            add_rect_centrado(cx, cy, grosor, alto_total, "SERPENTIN")
+            add_rect_centrado(cx, cy, grosor, alto_total, "microheater")
 
             # Arranca en el borde del dedo en la dirección de viaje.
             borde_de_salida = cx + direccion * (grosor / 2)
@@ -216,7 +216,7 @@ def generar_serpentin_real(
             # apilado más allá de la punta.
             cy_pieza = y_punta_libre - signo_libre * (grosor / 2)
 
-            add_rect_centrado(cx_horizontal, cy_pieza, ydist, grosor, "SERPENTIN")
+            add_rect_centrado(cx_horizontal, cy_pieza, ydist, grosor, "microheater")
 
             cx_pad = borde_de_salida + direccion * (ydist + dpads / 2)
             add_rect_centrado(cx_pad, cy_pieza, dpads, hpads, "PADS")
@@ -230,12 +230,12 @@ def generar_serpentin_real(
         msp.add_arc(
             center=(cx_vuelta, cy_vuelta), radius=r_interior,
             start_angle=angulo_inicio, end_angle=angulo_fin,
-            dxfattribs={"layer": "SERPENTIN"},
+            dxfattribs={"layer": "microheater"},
         )
         msp.add_arc(
             center=(cx_vuelta, cy_vuelta), radius=r_exterior,
             start_angle=angulo_inicio, end_angle=angulo_fin,
-            dxfattribs={"layer": "SERPENTIN"},
+            dxfattribs={"layer": "microheater"},
         )
 
     # --- Rectángulo exterior: AHORA se dibuja directo con x_length y
@@ -297,7 +297,7 @@ def main():
     DIST_ENTRE_PADS = 5.0     # distancia FIJA entre los dos pads
 
     try:
-        info = generar_serpentin_real(
+        info = generar_microheater_real(
             x_length=X_LENGTH,
             y_length=Y_LENGTH,
             lz=LZ,
@@ -307,7 +307,7 @@ def main():
             dpads=DPADS,
             hpads=HPADS,
             dist_entre_pads=DIST_ENTRE_PADS,
-            nombre_archivo="serpentin_real.dxf",
+            nombre_archivo="microheater_real.dxf",
         )
         print("\n¡Listo! Archivo guardado en:")
         print(f"  {info['ruta_absoluta']}")

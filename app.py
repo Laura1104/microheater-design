@@ -3,8 +3,8 @@ import uuid
 from flask import Flask, jsonify, render_template, request, send_file
 
 # Importamos las funciones de los generadores
-from generador_cad import generar_serpentin_real
-from generador_gerber import generar_serpentin_gerber
+from generador_cad import generar_microheater_real
+from generador_gerber import generar_microheater_gerber
 
 app = Flask(__name__)
 ultimo_comsol = None
@@ -31,10 +31,10 @@ def generar_cad():
     if n % 2 != 0:
       n += 1
 
-    nombre_dxf = 'serpentin_generado.dxf'
+    nombre_dxf = 'microheater_generado.dxf'
     ruta_salida = os.path.join('/tmp', nombre_dxf)
 
-    generar_serpentin_real(
+    generar_microheater_real(
         x_length=x_length,
         y_length=y_length,
         lz=lz,
@@ -61,12 +61,12 @@ def generar_cad():
 
 @app.route('/descargar_cad', methods=['GET'])
 def descargar_cad():
-  ruta_salida = os.path.join('/tmp', 'serpentin_generado.dxf')
+  ruta_salida = os.path.join('/tmp', 'microheater_generado.dxf')
   if os.path.exists(ruta_salida):
     return send_file(
         ruta_salida,
         as_attachment=True,
-        download_name='serpentin_disenado.dxf',
+        download_name='microheater_disenado.dxf',
     )
   return jsonify({'status': 'error', 'mensaje': 'Archivo no encontrado'}), 404
 
@@ -87,7 +87,7 @@ def generar_gerber():
     if n % 2 != 0:
       n += 1
 
-    generar_serpentin_gerber(
+    generar_microheater_gerber(
         x_length=x_length,
         y_length=y_length,
         lz=lz,
@@ -98,7 +98,7 @@ def generar_gerber():
         hpads=3.0,
         dist_entre_pads=5.0,
         carpeta_salida='/tmp',
-        nombre_base='serpentin_disenado',
+        nombre_base='microheater_disenado',
     )
 
     return jsonify({
@@ -115,12 +115,12 @@ def generar_gerber():
 
 @app.route('/descargar_gerber', methods=['GET'])
 def descargar_gerber():
-  ruta_zip = os.path.join('/tmp', 'serpentin_disenado_gerber.zip')
+  ruta_zip = os.path.join('/tmp', 'microheater_disenado_gerber.zip')
   if os.path.exists(ruta_zip):
     return send_file(
         ruta_zip,
         as_attachment=True,
-        download_name='serpentin_gerber.zip',
+        download_name='microheater_gerber.zip',
     )
   return jsonify({'status': 'error', 'mensaje': 'Archivo no encontrado'}), 404
 
@@ -150,14 +150,14 @@ def generar_comsol():
     if n % 2 != 0:
       n += 1
 
-    nombre_mph = f'serpentin_disenado_{uuid.uuid4().hex[:8]}.mph'
+    nombre_mph = f'microheater_disenado_{uuid.uuid4().hex[:8]}.mph'
     ruta_salida = os.path.join(app.root_path, nombre_mph)
 
     ultimo_comsol = nombre_mph
 
-    from comsol.generador_comsol import generar_serpentin_comsol
+    from comsol.generador_comsol import generar_microheater_comsol
 
-    generar_serpentin_comsol(
+    generar_microheater_comsol(
         x_length=x_length,
         y_length=y_length,
         lz=lz,
@@ -195,7 +195,7 @@ def descargar_comsol():
       return send_file(
           ruta_mph,
           as_attachment=True,
-          download_name='serpentin_disenado.mph',
+          download_name='microheater_disenado.mph',
       )
 
   return jsonify({
