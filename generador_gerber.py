@@ -1,43 +1,3 @@
-"""
-microheater_a_gerber.py
-------------------------
-Genera el MISMO serpentín que microheater_comsol_real.py (DXF) y
-microheater_a_comsol.py (COMSOL), con las mismas fórmulas, pero como
-archivos GERBER (formato RS-274X), el estándar que usan las
-fabricantes de PCB. Este mismo Gerber se puede abrir/importar en
-Altium (y en KiCad, etc.), por eso no hace falta un script aparte
-para Altium: Altium no se puede escribir desde Python, pero sí lee
-Gerber.
-
-SE GENERAN 2 ARCHIVOS (+ un .zip con los dos):
-    <nombre>_cobre.gtl     -> capa de COBRE superior: el serpentín
-                              (dedos, tramos horizontales, vueltas)
-                              y los pads.
-    <nombre>_contorno.gko  -> CONTORNO de la placa: el rectángulo
-                              exterior (x_length x y_length).
-    (Así se separa en el mundo real: el cobre y el borde de la
-     placa van en capas distintas.)
-
-DECISIONES DE DISEÑO (para que sepas qué se hizo y por qué):
-    - Unidades: milímetros. Formato de coordenadas 4.6 (6 decimales).
-    - El origen (0,0) se pone en la ESQUINA INFERIOR IZQUIERDA de la
-      placa, para que todas las coordenadas sean positivas (muchas
-      herramientas de PCB lo prefieren). Por eso, a cada coordenada
-      del diseño (que en el DXF está centrado en el origen) se le
-      suma un desplazamiento (ox, oy).
-    - Dedos y tramos horizontales: se dibujan como "regiones" rellenas
-      (G36/G37). Las piezas se traslapan donde se tocan, y en Gerber
-      el cobre se suma, así que el resultado es una sola pista
-      continua (igual que el "unir" automático de COMSOL).
-    - Vueltas (semicírculos gruesos): también una región, con arcos
-      (G03 = arco antihorario, G02 = horario) en vez de segmentos.
-    - Pads: se "flashean" (D03) con una apertura rectangular
-      dpads x hpads -- así las herramientas los reconocen como pads
-      de verdad, no solo como un dibujo de cobre.
-    - El contorno se traza con una línea de 0.1 mm de ancho.
-
-Requisitos: ninguno (solo la librería estándar de Python).
-"""
 
 import os
 import zipfile
@@ -56,17 +16,7 @@ def generar_microheater_gerber(
     carpeta_salida: str = ".",
     nombre_base: str = "microheater",
 ):
-    """
-    Genera los archivos Gerber del serpentín.
 
-    Mismos parámetros y mismas fórmulas que generar_microheater_real()
-    (el de DXF) -- ver ese archivo para el detalle de cada fórmula.
-    Retorna un dict con las rutas de los archivos y los valores
-    calculados.
-    """
-    # ============================================================
-    # 1) MISMAS FÓRMULAS que en los otros scripts
-    # ============================================================
     if n % 2 != 0 or n < 2:
         raise ValueError(f"n debe ser par y >= 2 (recibido n={n}).")
 
@@ -100,13 +50,6 @@ def generar_microheater_gerber(
         base = (i % 2 == 0)
         return base if primera_vuelta_arriba else (not base)
 
-    # ============================================================
-    # 2) Desplazamiento: origen en la esquina inferior izquierda
-    # ============================================================
-    # En el diseño (como en el DXF) el rectángulo exterior va de
-    #   x: -x_length/2 .. +x_length/2
-    #   y: y0 .. y0 + y_length,   con y0 = -(ly/2 + r_exterior) - a
-    # Para que la esquina inferior izquierda quede en (0,0):
     y0 = -(ly / 2 + r_exterior) - a
     ox = x_length / 2
     oy = -y0
@@ -119,9 +62,7 @@ def generar_microheater_gerber(
         """Texto de coordenadas Gerber, ya desplazado al origen nuevo."""
         return f"X{n6(x + ox)}Y{n6(y + oy)}"
 
-    # ============================================================
-    # 3) Capa de COBRE
-    # ============================================================
+    # Capa de Cobre
     cobre = []     # líneas de comandos que van dentro del archivo
     pads = []      # centros (x, y) de los pads, para flashearlos al final
 
@@ -138,20 +79,7 @@ def generar_microheater_gerber(
         cobre.append("G37*")
 
     def region_vuelta(cx, cy, arriba):
-        """
-        Semicírculo grueso (banda entre r_interior y r_exterior).
 
-        arriba=True : mitad superior (forma "∩"), de 0° a 180°.
-        arriba=False: mitad inferior (forma "∪"), de 180° a 360°.
-
-        Contorno de la región (siempre en este orden):
-          1. arco EXTERIOR antihorario (G03)
-          2. línea recta al borde del arco interior
-          3. arco INTERIOR horario (G02), de regreso
-          4. línea recta que cierra la región
-        I y J son el desplazamiento desde el punto de inicio del arco
-        hasta su centro.
-        """
         ro, ri = r_exterior, r_interior
         if arriba:
             p_ext_ini = (cx + ro, cy)   # ángulo 0°
@@ -180,7 +108,6 @@ def generar_microheater_gerber(
         cobre.append(f"{xy(*p_ext_ini)}D01*")  # cerrar
         cobre.append("G37*")
 
-    # --- Dedos, tramos horizontales y pads (misma lógica que en el DXF) ---
     for i in range(n):
         es_terminal = (i == 0 or i == n - 1)
         cx = centros_x[i]
@@ -216,14 +143,13 @@ def generar_microheater_gerber(
             cx_pad = borde_de_salida + direccion * (ydist + dpads / 2)
             pads.append((cx_pad, cy_pieza))
 
-    # --- Vueltas entre dedos consecutivos ---
     for i in range(n - 1):
         cx_vuelta = (centros_x[i] + centros_x[i + 1]) / 2
         arriba = vuelta_va_arriba(i)
         cy_vuelta = ly / 2 if arriba else -ly / 2
         region_vuelta(cx_vuelta, cy_vuelta, arriba)
 
-    # --- Armar el archivo de cobre ---
+    # Archivo cobre
     lineas_cobre = [
         "G04 microheater - capa de cobre superior (generado por microheater_a_gerber.py)*",
         "%MOMM*%",
@@ -241,9 +167,7 @@ def generar_microheater_gerber(
         lineas_cobre.append(f"{xy(px, py)}D03*")  # D03 = "flash" (estampar)
     lineas_cobre.append("M02*")                  # fin del archivo
 
-    # ============================================================
-    # 4) Capa de CONTORNO (rectángulo exterior)
-    # ============================================================
+    # Rectangulo exterior
     xa, xb = -x_length / 2, x_length / 2
     ya, yb = y0, y0 + y_length
     lineas_contorno = [
@@ -265,9 +189,7 @@ def generar_microheater_gerber(
         "M02*",
     ]
 
-    # ============================================================
-    # 5) Escribir los archivos y el .zip
-    # ============================================================
+
     os.makedirs(carpeta_salida, exist_ok=True)
     ruta_cobre = os.path.abspath(os.path.join(carpeta_salida, f"{nombre_base}_cobre.gtl"))
     ruta_contorno = os.path.abspath(os.path.join(carpeta_salida, f"{nombre_base}_contorno.gko"))
@@ -297,13 +219,13 @@ def generar_microheater_gerber(
 
 
 def main():
-    # --- Lo que te dan a ti como parámetro (en la página web vienen del formulario) ---
+    
     X_LENGTH = 40.0
     Y_LENGTH = 45.0
     LZ = 3.0
     N = 6
 
-    # --- Fijos ---
+    # fijos
     MARGEN_A = 5.0
     DIST_SEPAR = 2.0
     DPADS = 2.0

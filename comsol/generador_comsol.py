@@ -1,45 +1,3 @@
-"""
-microheater_a_comsol.py
-------------------------
-Construye el MISMO serpentín que microheater_comsol_real.py (pasos 1-9,
-mismas fórmulas), pero en vez de dibujar un DXF, le da las órdenes a
-COMSOL mismo para que él arme la geometría -- y al final guarda un
-archivo .mph real.
-
-POR QUÉ ES DISTINTO AL SCRIPT DE DXF:
-    Un .mph es un formato binario propietario; no se puede "escribir"
-    desde cero en Python como el DXF. Lo que SÍ se puede es controlar
-    una instalación de COMSOL desde Python (vía la librería "mph", que
-    maneja el motor Java de COMSOL por debajo) y pedirle a COMSOL que
-    cree cada rectángulo/sector/etc. con su propia API -- exactamente
-    como si alguien los estuviera creando a mano en la interfaz, pero
-    automatizado.
-
-REQUISITOS para correr esto (a diferencia del script de DXF):
-    - COMSOL instalado, con licencia, en la máquina donde se ejecute.
-    - pip install mph
-
-NO LO PUDE PROBAR aquí (no tengo COMSOL en este entorno) -- los
-nombres de propiedades (size, pos, rot, angle...) son los que documenta
-COMSOL en su API de Java, pero si alguno no coincide exacto con tu
-versión de COMSOL, el error de Java te va a decir cuál -- pégamelo y lo
-ajustamos.
-
-CORRESPONDENCIA CON LOS PASOS (igual que en el script de DXF):
-    Cada "dedo" y cada "pad" se crean como un rectángulo de COMSOL
-    (feature "Rectangle"), con pos=(cx,cy) y base="center" -- así no
-    hace falta construirlo ancho x grosor y rotarlo 90°: directo le
-    decimos el tamaño ya orientado (size=[ancho_en_x, alto_en_y]).
-
-    Cada "vuelta" (semicírculo grueso) se construye como DOS sectores
-    circulares (feature "Circle" con "angle"=180) -- uno de radio
-    r_exterior y otro de radio r_interior -- y se les resta el interior
-    al exterior (feature "Difference") para dejar la banda curva.
-
-    Al final, COMSOL une automáticamente todas las piezas que se tocan
-    cuando se construye la geometría (no hace falta Union explícito,
-    igual que en el DXF no hizo falta un "merge").
-"""
 
 import os
 
@@ -56,19 +14,9 @@ def generar_microheater_comsol(
     dist_entre_pads: float = 5.0,
     nombre_archivo: str = "microheater.mph",
 ):
-    """
-    Construye el serpentín directo en COMSOL y guarda el .mph.
+    
+    import mph  
 
-    Mismos parámetros y mismas fórmulas que generar_microheater_real()
-    (el de DXF) -- ver ese archivo para el detalle de cada fórmula.
-    Retorna un dict con los valores calculados, igual que la versión DXF.
-    """
-    import mph  # import aquí adentro para que el resto del archivo se
-                # pueda importar aunque la máquina no tenga mph instalado
-
-    # ============================================================
-    # 1) MISMAS FÓRMULAS que en el script de DXF (sin tocar COMSOL todavía)
-    # ============================================================
     if n % 2 != 0 or n < 2:
         raise ValueError(f"n debe ser par y >= 2 (recibido n={n}).")
 
@@ -102,9 +50,7 @@ def generar_microheater_comsol(
         base = (i % 2 == 0)
         return base if primera_vuelta_arriba else (not base)
 
-    # ============================================================
-# 2) Arrancar COMSOL y crear el modelo vacío
-# ============================================================
+    # Arrancar comsol y modelo vacio
 
     client = mph.start()
 
@@ -113,12 +59,9 @@ def generar_microheater_comsol(
 
     model = client.create("microheater")
 
-    # Un componente, una geometría 2D
     model.java.component().create("comp1", True)
     model.java.component("comp1").geom().create("geom1", 2)
     geom = model.java.component("comp1").geom("geom1")
-
-    # Contadores para los nombres (tags) de cada feature
     contador = {"r": 0, "c": 0, "dif": 0}
 
     def nuevo_tag(tipo):
@@ -159,9 +102,6 @@ def generar_microheater_comsol(
         f_dif.selection("input").set(tag_out)
         f_dif.selection("input2").set(tag_in)
     
-    # ============================================================
-    # 3) Construir cada pieza -- misma lógica que el script de DXF
-    # ============================================================
     y_punta_libre_guardada = None
 
     for i in range(n):
@@ -210,15 +150,11 @@ def generar_microheater_comsol(
         cy_vuelta = ly / 2 if arriba else -ly / 2
         vuelta(cx_vuelta, cy_vuelta, arriba)
 
-    # --- Rectángulo exterior ---
     extremo_inferior = -(ly / 2 + r_exterior)
     y0 = extremo_inferior - a
     cy_rect_exterior = y0 + y_length / 2
     rect(0, cy_rect_exterior, x_length, y_length)
 
-    # ============================================================
-    # 4) Construir (geom.run) y guardar el .mph
-    # ============================================================
     geom.run()
 
     ruta_absoluta = os.path.abspath(nombre_archivo)
