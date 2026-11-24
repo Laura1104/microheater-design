@@ -53,11 +53,11 @@ def generar_microheater_real(
     y_length: float,
     lz: float,
     n: int,
-    a: float = 5.0,
-    distSepar: float = 2.0,
-    dpads: float = 3.0,
-    hpads: float = 3.0,
-    dist_entre_pads: float = 5.0,
+    a: float = 2.0   ,
+    distSepar: float = 2,
+    dpads: float = 1.7,
+    hpads: float = 1.7,
+    dist_entre_pads: float = 3.0,
     nombre_archivo: str = "microheater_real.dxf",
 ):
     """
@@ -123,6 +123,19 @@ def generar_microheater_real(
             "resultante; baja dist_entre_pads o revisa n/grosor/lz/dpads."
         )
 
+    pad_max = min(dpads, hpads)
+    if grosor > pad_max:
+        raise ValueError(
+            f"grosor calculado ({grosor:.3f}) supera el tamaño del pad ({pad_max:.3f})."
+        )
+
+    if distSepar < r_exterior + r_interior:
+        raise ValueError(
+            f"distSepar ({distSepar:.3f}) es menor que r_exterior + r_interior "
+            f"({r_exterior + r_interior:.3f}); puede solapar curvas y pads."
+        )
+        
+        
     doc = ezdxf.new("R2010")
     msp = doc.modelspace()
 
@@ -259,11 +272,11 @@ def main():
     N = 6                     # número de dedos/loops, debe ser PAR (n) ml
 
     # constantes del diseño
-    MARGEN_A = 5.0            # margen constante en los 4 lados (a)
+    MARGEN_A = 2.0            # margen constante en los 4 lados (a)
     DIST_SEPAR = 2.0          # longitud extra en la punta del dedo terminal (distSepar)
-    DPADS = 3.0               # ancho del pad (dpads)
-    HPADS = 3.0               # alto del pad (hpads)
-    DIST_ENTRE_PADS = 5.0     # distancia FIJA entre los dos pads
+    DPADS = 1.7               # ancho del pad (dpads)
+    HPADS = 1.7             # alto del pad (hpads)
+    DIST_ENTRE_PADS = 3.0     # distancia FIJA entre los dos pads
 
     try:
         info = generar_microheater_real(

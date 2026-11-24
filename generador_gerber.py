@@ -8,11 +8,11 @@ def generar_microheater_gerber(
     y_length: float,
     lz: float,
     n: int,
-    a: float = 5.0,
+    a: float = 2.0,
     distSepar: float = 2.0,
-    dpads: float = 3.0,
-    hpads: float = 3.0,
-    dist_entre_pads: float = 5.0,
+    dpads: float = 1.7,
+    hpads: float = 1.7,
+    dist_entre_pads: float = 3.0,
     carpeta_salida: str = ".",
     nombre_base: str = "microheater",
 ):
@@ -226,11 +226,11 @@ def main():
     N = 6
 
     # fijos
-    MARGEN_A = 5.0
+    MARGEN_A = 2.0
     DIST_SEPAR = 2.0
-    DPADS = 2.0
-    HPADS = 2.0
-    DIST_ENTRE_PADS = 5.0
+    DPADS = 1.7
+    HPADS = 1.7
+    DIST_ENTRE_PADS = 3.0
 
     try:
         info = generar_microheater_gerber(

@@ -1,1584 +1,1710 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Microheater Design – Automated Microheater Design</title>
+<meta name="description" content="Diseño y optimización de microcalentadores con Machine Learning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&display=swap">
 
-    <title>Microheater Design | Automated Microheater Design</title>
-
-    <!-- Tailwind -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+<!-- Tailwind y FontAwesome -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
+body{margin:0;background:#FFFFFF}
+html{scroll-behavior:smooth}
+section{scroll-margin-top:72px}
+a{color:#2E58A6}a:hover{color:#284269}
+.bp{background-color:#FFFFFF;background-image:linear-gradient(rgba(40,66,105,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(40,66,105,0.05) 1px,transparent 1px);background-size:32px 32px}
+.mh-in:focus-visible{outline:3px solid #2E58A6;outline-offset:2px}
+.mh-field:focus-within{outline:3px solid #2E58A6;outline-offset:2px}
+.mh-btn:hover{filter:brightness(1.1)}
+.mh-nav:hover{color:#284269;background:#EEF3FA}
+.mh-icon:hover{background:#EEF3FA}
+.mh-exp:hover{background:rgba(255,255,255,0.12)}
+.mh-team{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.mh-sec{padding-top:104px;padding-bottom:104px}
+@media (max-width:900px){.mh-team{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px} }
+@media (max-width:640px){.mh-hide-sm{display:none !important}.mh-sec{padding-top:64px;padding-bottom:64px} }
 
-    body {
-        font-family: 'Inter', sans-serif;
-    }
+/* Animaciones del profesor (React Bits style) */
+@keyframes mhBlurIn { from { opacity: 0; filter: blur(12px); transform: translateY(-14px); } to { opacity: 1; filter: blur(0); transform: none; } }
+.mh-blur { display: inline-block; animation: mhBlurIn 0.8s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes mhReveal { from { opacity: 0.15; filter: blur(6px); } to { opacity: 1; filter: blur(0); } }
+@keyframes mhSlide { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
 
-    /* HERO */
-    .hero-image {
-        animation: emerge 0.8s ease-out forwards;
-    }
+/* Star Border */
+.mh-star{position:relative;border-radius:16px;padding:1.5px;overflow:hidden;background:#CBD5E1;box-shadow:0 1px 2px rgba(15,23,42,0.06),0 10px 28px rgba(40,66,105,0.08)}
+.mh-star::before,.mh-star::after{content:"";position:absolute;width:300%;height:50%;border-radius:50%;opacity:0.9;z-index:0}
+.mh-star::before{bottom:-11px;right:-250%;background:radial-gradient(circle,#2E58A6,transparent 10%);animation:mhStarB 5s linear infinite alternate}
+.mh-star::after{top:-10px;left:-250%;background:radial-gradient(circle,#2E58A6,transparent 10%);animation:mhStarT 5s linear infinite alternate}
+@keyframes mhStarB{0%{transform:translate(0%,0%);opacity:1}100%{transform:translate(-100%,0%);opacity:0} }
+@keyframes mhStarT{0%{transform:translate(0%,0%);opacity:1}100%{transform:translate(100%,0%);opacity:0} }
 
-    @keyframes emerge {
-        from {
+.mh-spot{background-color:#284269;background-image:radial-gradient(380px circle at var(--mx,72%) var(--my,26%),rgba(94,134,201,0.45),transparent 62%)}
+.mh-bento{transition:border-color .25s,box-shadow .25s,transform .25s}
+.mh-bento:hover{transform:translateY(-3px);box-shadow:0 16px 36px rgba(40,66,105,0.14)}
+.mh-bento-light{background-color:#FFFFFF;border:1px solid #DCE3EE}
+.mh-spin{animation:mhSpin 16s linear infinite}
+@keyframes mhSpin{to{transform:rotate(360deg)} }
+
+/* Design process animation styles */
+.process-step, .process-arrow, .adjust-process { opacity: 0; }
+.process-step { transform: translateX(-20px); }
+.adjust-process { transform: translateY(10px); }
+.why-visible .process-step { animation: processIn 0.7s ease-out forwards; }
+.why-visible .process-step.define { animation-delay: 0.2s; }
+.why-visible .process-step.evaluate { animation-delay: 0.7s; }
+.why-visible .process-step.compare { animation-delay: 1.2s; }
+/* Flechas del proceso */
+.why-visible .process-arrow {
+    animation: arrowIn 0.5s ease-out forwards;
+}
+
+.why-visible .process-arrow.first {
+    animation-delay: 0.5s;
+}
+
+.why-visible .process-arrow.second {
+    animation-delay: 1s;
+}
+.why-visible .why-visible .adjust-process { animation: adjustIn 0.6s ease-out forwards; animation-delay: 1.7s; }
+@keyframes processIn { to { opacity: 1; transform: translateX(0); } }
+@keyframes arrowIn { to { opacity: 1; } }
+@keyframes adjustIn { to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<template id="xdc">
+{% raw %}
+<div style="width: 100%; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #334155; background: #FFFFFF; line-height: 1.5">
+
+<!-- Barra Superior -->
+<div style="background: #284269; color: #FFFFFF; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-align: center; padding: 9px 16px">
+    {{t.announce}} <a class="mh-link" href="#" style="color: #FFFFFF; font-weight: 600">{{t.announceLink}}</a>
+</div>
+
+<!-- Header -->
+<header style="position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.96); border-bottom: 1px solid #DCE3EE">
+<div style="max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 24px">
+    <a href="#home" class="mh-link" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #284269; flex-grow: 1; min-height: 44px">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none" stroke="#2E58A6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 24V5h4.5v18H14V5h4.5v18H23V4"></path></svg>
+        <span style="font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 19px">Microheater Design</span>
+    </a>
+    <nav class="mh-hide-sm" style="display: flex; flex-wrap: wrap; gap: 2px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em">
+        <a href="#why" class="mh-link mh-nav" style="padding: 12px 10px; border-radius: 6px; text-decoration: none; color: #334155">[01] {{t.nav0}}</a>
+        <a href="#designer" class="mh-link mh-nav" style="padding: 12px 10px; border-radius: 6px; text-decoration: none; color: #334155">[02] {{t.nav1}}</a>
+        <a href="#team" class="mh-link mh-nav" style="padding: 12px 10px; border-radius: 6px; text-decoration: none; color: #334155">[03] {{t.nav2}}</a>
+    </nav>
+    <div style="display: flex; border: 1px solid #CBD5E1; border-radius: 8px; padding: 3px">
+        <button style="{{enStyle}}" onClick="{{setEn}}">EN</button>
+        <button style="{{esStyle}}" onClick="{{setEs}}">ES</button>
+    </div>
+    <!-- Logo Universidad de los Andes -->
+    <div style="display: flex; align-items: center; margin-left: 12px;">
+        <img src="/static/images/ibio.png" alt="Universidad de los Andes" style="height: 3.5rem; width: auto; object-fit: contain;">
+    </div>
+</div>
+</header>
+
+<!-- Hero Section (Aquí es donde van "los punticos" interactivos con el canvas) -->
+<section id="home" onMouseMove="{{heroMove}}" onMouseLeave="{{heroLeave}}" style="position: relative; overflow: hidden; background: #FFFFFF; border-bottom: 1px solid #DCE3EE">
+<canvas ref="{{setDotCanvas}}" aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none"></canvas>
+<div style="position: relative; max-width: 1200px; margin: 0 auto; padding: 72px 24px 88px; display: flex; flex-wrap: wrap; align-items: center; gap: 48px">
+<div style="flex: 1 1 500px; min-width: 0">
+    <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #2E58A6"><span>{{dec}}</span></p>
+    <h1 style="margin: 20px 0 0; font-family: 'Space Grotesk', sans-serif; font-size: clamp(48px, 6.4vw, 84px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; color: #284269">
+        <span class="mh-blur">{{t.h1a}}</span><br><span class="mh-blur" style="color: #2E58A6">{{t.h1b}}</span><br><span class="mh-blur">{{t.h1c}}</span>
+    </h1>
+    <p style="margin: 24px 0 0; max-width: 520px; font-size: 19px; color: #334155">{{t.sub}}</p>
+</div>
+
+<!-- AQUÍ VA EL REEMPLAZO DE LA FIGURA -->
+<figure 
+    class="mh-spot" 
+    onmousemove="const r=this.getBoundingClientRect();this.style.setProperty('--mx',(event.clientX-r.left)+'px');this.style.setProperty('--my',(event.clientY-r.top)+'px');"
+    style="position: relative; overflow: hidden; flex: 1 1 400px; min-width: 0; margin: 0; border-radius: 18px; padding: 24px 24px 20px; color: #FFFFFF; background: #132238; border: 1px solid rgba(147, 180, 237, 0.18); box-shadow: 0 20px 50px rgba(40,66,105,0.22); --mx: 50%; --my: 50%;"
+>
+    <style>
+        .mh-spot::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(
+                360px circle at var(--mx) var(--my),
+                rgba(116, 165, 255, 0.25),
+                rgba(64, 114, 204, 0.08) 45%,
+                transparent 75%
+            );
             opacity: 0;
-            transform: translateY(20px) scale(0.97);
+            transition: opacity 0.35s ease;
+            z-index: 1;
+        }
+        .mh-spot:hover::before {
+            opacity: 1;
+        }
+        #mhIsoCanvas {
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .mh-spot:hover #mhIsoCanvas {
+            transform: translateY(-4px);
+        }
+    </style>
+
+
+    <!-- Contenedor con Canvas -->
+    <div style="position: relative; z-index: 2; width: 100%; max-width: 460px; height: 350px; margin: 4px auto 0; display: flex; align-items: center; justify-content: center;">
+        <canvas id="mhIsoCanvas" width="720" height="580" style="width: 100%; height: 100%; display: block;"></canvas>
+    </div>
+
+</figure>
+
+<script>
+(function() {
+    function drawMicroheater() {
+        const c = document.getElementById('mhIsoCanvas');
+        if (!c || !c.getContext) return;
+        const ctx = c.getContext('2d');
+        
+        // Escala base 360x290 dibujada en resolución 2x (720x580) para máxima nitidez
+        ctx.clearRect(0, 0, c.width, c.height);
+        ctx.save();
+        ctx.scale(2, 2);
+
+        const tracePoints = [
+            [108, 103], [72, 123], [164, 176], [176, 169],
+            [94, 122],  [106, 115], [188, 162], [200, 155],
+            [118, 108], [130, 101], [212, 148], [224, 141],
+            [142, 94],  [154, 87],  [236, 134], [248, 127],
+            [166, 80],  [178, 73],  [260, 120], [272, 113],
+            [184, 62],  [144, 84]
+        ];
+
+        function tracePath() {
+            ctx.beginPath();
+            ctx.moveTo(tracePoints[0][0], tracePoints[0][1]);
+            for (let i = 1; i < tracePoints.length; i++) {
+                ctx.lineTo(tracePoints[i][0], tracePoints[i][1]);
+            }
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+        function drawPoly(pts, fill, stroke, lineWidth = 1) {
+            ctx.beginPath();
+            ctx.moveTo(pts[0][0], pts[0][1]);
+            for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+            ctx.closePath();
+            if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+            if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lineWidth; ctx.stroke(); }
         }
+
+        // 1. BLOQUE ISOMÉTRICO 3D (Sustrato)
+        const topGrad = ctx.createLinearGradient(28, 32, 332, 204);
+        topGrad.addColorStop(0, 'rgba(35, 60, 97, 0.78)');
+        topGrad.addColorStop(1, 'rgba(23, 42, 70, 0.45)');
+
+        const leftGrad = ctx.createLinearGradient(28, 118, 28, 226);
+        leftGrad.addColorStop(0, 'rgba(45, 76, 122, 0.65)');
+        leftGrad.addColorStop(1, 'rgba(20, 35, 58, 0.85)');
+
+        // Cara superior
+        drawPoly([[180,32], [332,114], [166,204], [28,118]], topGrad, '#567BB0', 1);
+        // Cara frontal izquierda
+        drawPoly([[28,118], [166,204], [166,226], [28,140]], leftGrad, '#567BB0', 1);
+        // Cara frontal derecha
+        drawPoly([[166,204], [332,114], [332,136], [166,226]], 'rgba(25, 45, 75, 0.85)', '#567BB0', 1);
+
+        // Aristas internas posteriores punteadas (efecto transparente)
+        ctx.save();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = 'rgba(77, 110, 158, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(28, 140);
+        ctx.lineTo(180, 54);
+        ctx.lineTo(332, 136);
+        ctx.moveTo(180, 32);
+        ctx.lineTo(180, 54);
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. ISOTERMAS CONCÉNTRICAS EN EL PLANO
+        const isotherms = [
+            [[180,44], [312,115], [166,193], [48,119]],
+            [[180,56], [292,116], [166,182], [68,120]],
+            [[180,68], [272,117], [166,171], [88,121]],
+            [[180,80], [252,118], [166,160], [108,122]]
+        ];
+        isotherms.forEach(pts => drawPoly(pts, null, 'rgba(147, 180, 237, 0.18)', 0.9));
+
+        // 3. SERPENTÍN CON RESPLANDOR TÉRMICO
+        ctx.save();
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+
+        // Halo difuso exterior
+        ctx.shadowColor = 'rgba(94, 134, 201, 0.95)';
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = 'rgba(94, 134, 201, 0.55)';
+        ctx.lineWidth = 9;
+        tracePath();
+        ctx.stroke();
+
+        // Halo medio
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = 'rgba(139, 168, 209, 0.85)';
+        ctx.lineWidth = 4;
+        tracePath();
+        ctx.stroke();
+
+        // Núcleo blanco brillante
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = '#FFFFFF';
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 1.9;
+        tracePath();
+        ctx.stroke();
+        ctx.restore();
+
+        // 4. PADS DE CONTACTO ISOMÉTRICOS
+        drawPoly([[109,92], [123,100], [109,108], [95,100]], '#C9D7EE', '#FFFFFF', 0.8);
+        drawPoly([[139,75], [153,83], [139,91], [125,83]], '#C9D7EE', '#FFFFFF', 0.8);
+
+        // 5. COTAS TÉCNICAS
+        ctx.strokeStyle = 'rgba(139, 168, 209, 0.85)';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        // Izquierda (35.0 mm)
+        ctx.moveTo(22, 147); ctx.lineTo(160, 233);
+        ctx.moveTo(18, 151); ctx.lineTo(26, 143);
+        ctx.moveTo(156, 237); ctx.lineTo(164, 229);
+        // Derecha (30.0 mm)
+        ctx.moveTo(174, 233); ctx.lineTo(336, 144);
+        ctx.moveTo(170, 229); ctx.lineTo(178, 237);
+        ctx.moveTo(332, 140); ctx.lineTo(340, 148);
+        ctx.stroke();
+
+        // Textos de las cotas
+        ctx.fillStyle = '#C9D7EE';
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+
+        ctx.save();
+        ctx.translate(80, 204);
+        ctx.rotate(31 * Math.PI / 180);
+        ctx.fillText('20.0 mm', 0, 0);
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(266, 202);
+        ctx.rotate(-29 * Math.PI / 180);
+        ctx.fillText('30.0 mm', 0, 0);
+        ctx.restore();
+
+        ctx.restore();
     }
 
+    // Ejecutar inmediatamente y reintentar brevemente por si el DOM carga asíncrono
+    drawMicroheater();
+    setTimeout(drawMicroheater, 150);
+})();
+</script>
+</div>
+</section>
 
-    /* TEAM DRIFT WALL */
+<!-- Why Section -->
+<section id="why" class="mh-sec" style="background: #F5F7FB; font-family: 'IBM Plex Sans', sans-serif;">
 
-    .team-photo {
-        height: 210px;
-        border: 1px solid #e2e8f0;
-        border-radius: 6px;
+    <style>
+        /* Typography */
+        #why h2,
+        #why h3 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        #why .why-eyebrow,
+        #why .why-card-label,
+        #why .why-number,
+        #why .why-footer,
+        #why .why-ring-text {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Main title animation */
+        #why .why-title {
+            animation: mhReveal 0.8s cubic-bezier(.2,.7,.2,1) both;
+        }
+
+        #why .why-lead {
+            animation: mhReveal 0.8s cubic-bezier(.2,.7,.2,1) both;
+            animation-delay: 0.15s;
+        }
+
+        /* Cards */
+        #why .mh-bento {
+            --mx: 50%;
+            --my: 50%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            padding: 32px;
+            transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+        }
+
+        #why .mh-bento-light {
+            background: #FFFFFF;
+            border: 1px solid #DCE3EE;
+            color: #334155;
+            box-shadow: 0 10px 28px rgba(40,66,105,0.06);
+        }
+
+        #why .mh-bento-light::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .25s ease;
+            background: radial-gradient(280px circle at var(--mx) var(--my), rgba(46,88,166,0.09), transparent 70%);
+        }
+
+        #why .mh-bento-light:hover {
+            transform: translateY(-4px);
+            border-color: #B8C7DF;
+            box-shadow: 0 20px 42px rgba(40,66,105,0.14);
+        }
+
+        #why .mh-bento-light:hover::before {
+            opacity: 1;
+        }
+
+        #why .mh-bento-navy {
+            background: #284269;
+            border: 1px solid #284269;
+            color: #FFFFFF;
+            box-shadow: 0 12px 30px rgba(40,66,105,0.16);
+        }
+
+        #why .mh-bento-navy::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .25s ease;
+            background: radial-gradient(300px circle at var(--mx) var(--my), rgba(147,180,237,0.22), transparent 70%);
+        }
+
+        #why .mh-bento-navy:hover {
+            transform: translateY(-4px);
+            border-color: #4A73B5;
+            box-shadow: 0 22px 46px rgba(15,23,42,0.28), 0 0 0 1px rgba(147,180,237,0.28);
+        }
+
+        #why .mh-bento-navy:hover::before {
+            opacity: 1;
+        }
+
+        /* Circular rotating text & arrow */
+        #why .why-spin {
+            animation: mhSpin 16s linear infinite;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+
+        #why .why-ring-text {
+            font-size: 7.5px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            fill: #64748B;
+        }
+
+        /* Traditional process list */
+        #why .why-loop-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 12px;
+            margin: 0 -12px;
+            border-radius: 10px;
+            border-bottom: 1px dashed #CBD5E1;
+            font-size: 16px;
+            color: #334155;
+            transition: background-color .2s ease, transform .2s ease, color .2s ease;
+        }
+
+        #why .why-loop-item:last-child {
+            border-bottom: none;
+        }
+
+        #why .why-loop-item:hover {
+            background: #F1F5FB;
+            color: #284269;
+            transform: translateX(4px);
+        }
+
+        /* Microheater Design steps */
+        #why .why-tool-step {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 14px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.16);
+            font-size: 16px;
+            color: #FFFFFF;
+            animation: mhSlide 0.6s cubic-bezier(.2,.7,.2,1) both;
+            transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
+        }
+
+        #why .why-tool-step:hover {
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(201,215,238,0.45);
+            transform: translateX(4px);
+        }
+
+        #why .why-tool-step:nth-child(1) {
+            animation-delay: 0.25s;
+        }
+
+        #why .why-tool-step:nth-child(2) {
+            animation-delay: 0.40s;
+        }
+
+        #why .why-tool-step:nth-child(3) {
+            animation-delay: 0.55s;
+        }
+
+        #why .why-step-number {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: #284269;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            #why .mh-bento {
+                padding: 24px;
+            }
+
+            #why .why-card-header {
+                gap: 8px;
+            }
+
+            #why .why-title {
+                font-size: clamp(34px, 9vw, 46px) !important;
+            }
+        }
+
+        /* Accessibility: respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            #why *,
+            #why *::before,
+            #why *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+
+        <!-- Section heading -->
+        <p class="why-eyebrow" style="margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #2E58A6;">
+            [01] {{t.whyEyebrow}}
+        </p>
+
+        <div style="margin-top: 18px; display: flex; flex-wrap: wrap; gap: 20px 64px; align-items: flex-end;">
+
+            <h2 class="why-title" style="flex: 1 1 480px; margin: 0; font-size: clamp(36px, 4.4vw, 56px); line-height: 1.06; letter-spacing: -0.035em; font-weight: 700; color: #284269;">
+                {{t.whyTitle}}
+            </h2>
+
+            <p class="why-lead" style="flex: 1 1 340px; margin: 0; font-size: 17px; line-height: 1.7; color: #5B6B82;">
+                {{t.whyLead}}
+            </p>
+
+        </div>
+
+        <!-- Comparison cards -->
+        <div style="margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px;">
+
+            <!-- Traditional trial and error -->
+            <div class="mh-bento mh-bento-light" onmousemove="const r=this.getBoundingClientRect();this.style.setProperty('--mx',(event.clientX-r.left)+'px');this.style.setProperty('--my',(event.clientY-r.top)+'px');">
+
+                <div class="why-card-header" style="position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+
+                    <div>
+                        <p class="why-card-label" style="margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #5B6B82;">
+                            {{t.whyUsualLoop}}
+                        </p>
+
+                        <p style="margin: 8px 0 0; font-size: 14px; color: #94A3B8;">
+                            {{t.whyLoopSubtitle}}
+                        </p>
+                    </div>
+
+                    <!-- Rotating cycle icon & ring -->
+                    <div aria-hidden="true" style="position: relative; width: 104px; height: 104px; flex-shrink: 0; margin: -14px -10px -42px 0;">
+
+                        <svg class="why-spin" width="104" height="104" viewBox="0 0 104 104" style="display: block;">
+                            <defs>
+                                <path id="whyCirclePath" d="M52,52 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"></path>
+                            </defs>
+                            <text class="why-ring-text">
+                            </text>
+                        </svg>
+
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2E58A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 38px; top: 38px;">
+                            <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"></path>
+                        </svg>
+
+                    </div>
+                </div>
+
+                <!-- Traditional steps -->
+                <ol style="position: relative; z-index: 1; margin: 22px 0 0; padding: 0; list-style: none;">
+
+                    <li class="why-loop-item">
+                        <span class="why-number" style="font-size: 13px; font-weight: 600; color: #2E58A6;">01</span>
+                        <span>{{t.whyLoop1}}</span>
+                    </li>
+
+                    <li class="why-loop-item">
+                        <span class="why-number" style="font-size: 13px; font-weight: 600; color: #2E58A6;">02</span>
+                        <span>{{t.whyLoop2}}</span>
+                    </li>
+
+                    <li class="why-loop-item">
+                        <span class="why-number" style="font-size: 13px; font-weight: 600; color: #2E58A6;">03</span>
+                        <span>{{t.whyLoop3}}</span>
+                    </li>
+
+                    <li class="why-loop-item">
+                        <span class="why-number" style="font-size: 13px; font-weight: 600; color: #2E58A6;">04</span>
+                        <span>{{t.whyLoop4}}</span>
+                    </li>
+
+                </ol>
+
+                <p class="why-footer" style="position: relative; z-index: 1; margin: 18px 0 0; font-size: 12px; color: #5B6B82;">
+                    ↻ {{t.whyLoopFooter}}
+                </p>
+
+            </div>
+
+            <!-- Microheater Design approach -->
+            <div class="mh-bento mh-bento-navy" onmousemove="const r=this.getBoundingClientRect();this.style.setProperty('--mx',(event.clientX-r.left)+'px');this.style.setProperty('--my',(event.clientY-r.top)+'px');">
+
+                <p class="why-card-label" style="position: relative; z-index: 1; margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #C9D7EE;">
+                    {{t.whyToolFlow}}
+                </p>
+
+                <p style="position: relative; z-index: 1; margin: 8px 0 22px; font-size: 14px; color: #C9D7EE; line-height: 1.6;">
+                    {{t.whyToolSubtitle}}
+                </p>
+
+                <ol style="position: relative; z-index: 1; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px;">
+
+                    <li class="why-tool-step">
+                        <span class="why-step-number">1</span>
+                        <span>{{t.whyTool1}}</span>
+                    </li>
+
+                    <li class="why-tool-step">
+                        <span class="why-step-number">2</span>
+                        <span>{{t.whyTool2}}</span>
+                    </li>
+
+                    <li class="why-tool-step">
+                        <span class="why-step-number">3</span>
+                        <span>{{t.whyTool3}}</span>
+                    </li>
+
+                </ol>
+
+                <p class="why-footer" style="position: relative; z-index: 1; margin: 20px 0 0; font-size: 12px; color: #C9D7EE;">
+                    → {{t.whyToolFooter}}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<!-- End Why Section -->
+
+<!-- Designer Section (Tus inputs, dimensiones y las Estrategias A, B, C conectadas a Flask) -->
+<section id="designer" class="bp mh-sec" style="border-top: 1px solid #DCE3EE; border-bottom: 1px solid #DCE3EE">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 24px">
+<p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-transform: uppercase; color: #2E58A6">[02] {{t.howEyebrow}}</p>
+<h2 style="margin: 18px 0 36px; font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700; color: #284269">{{t.howTitle}}</h2>
+
+<!-- Contenedor principal horizontal (Izquierda: Formulario | Derecha: Panel Azul) -->
+<div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+    
+    <!-- Formulario de Parámetros -->
+    <div style="flex: 1 1 420px; background: #FFFFFF; border: 1px solid #DCE3EE; border-radius: 16px; padding: 32px; box-shadow: 0 8px 24px rgba(40,66,105,0.06)">
+        <h3 style="margin: 0 0 20px; font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: #284269">{{t.formTitle}}</h3>
+        
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- Dimensiones X e Y -->
+            <div>
+                <label style="display: block; font-size: 14px; font-weight: 600; color: #284269; margin-bottom: 8px">{{t.plateDimsLabel}}</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div style="border: 1px solid #7C8DA6; border-radius: 8px; padding: 8px 12px; background: #FFF;">
+                        <span style="font-size: 11px; color: #5B6B82; font-family: 'IBM Plex Mono', monospace; display: block">{{t.xWidthLabel}}</span>
+                        <input id="x_length" type="number" step="0.5"
+       ref="{{xRef}}" oninput="{{onXInput}}"
+       style="width: 100%; border: none; outline: none; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: #284269; background: transparent">
+                    </div>
+                    <div style="border: 1px solid #7C8DA6; border-radius: 8px; padding: 8px 12px; background: #FFF;">
+                        <span style="font-size: 11px; color: #5B6B82; font-family: 'IBM Plex Mono', monospace; display: block">{{t.yLengthLabel}}</span>
+                       <input id="y_length" type="number" step="0.5"
+       ref="{{yRef}}" oninput="{{onYInput}}"
+       style="width: 100%; border: none; outline: none; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: #284269; background: transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Temperatura Objetivo y Estrategias A, B, C -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div style="border: 1px solid #7C8DA6; border-radius: 8px; padding: 8px 12px; background: #FFF;">
+                    <span style="font-size: 11px; color: #5B6B82; font-family: 'IBM Plex Mono', monospace; display: block">{{t.targetTempLabel}}</span>
+                    <input id="temp_target" type="number" step="0.5"
+       ref="{{tempRef}}" oninput="{{onTempInput}}"
+       style="width: 100%; border: none; outline: none; font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 600; color: #284269; background: transparent">
+                </div>
+                <div style="border: 1px solid #7C8DA6; border-radius: 8px; padding: 8px 12px; background: #FFF;">
+                    <span style="font-size: 11px; color: #5B6B82; font-family: 'IBM Plex Mono', monospace; display: block">{{t.strategyLabel}}</span>
+                    <select id="estrategia"
+        ref="{{stratRef}}" onchange="{{onStratChange}}"
+        style="width: 100%; border: none; outline: none; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; font-weight: 600; color: #284269; background: transparent; margin-top: 4px;">
+    <option value="A">{{t.stratA}}</option>
+    <option value="B">{{t.stratB}}</option>
+    <option value="C">{{t.stratC}}</option>
+</select>
+                </div>
+            </div>
+
+            <!-- Botones de Exportar con Flask -->
+            <div style="margin-top: 10px;">
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; text-transform: uppercase; color: #2E58A6; display: block; margin-bottom: 10px">{{t.exportGeomLabel}}</span>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                    <button type="button" onClick="generarYDescargar('comsol')" style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; background: #F8FAFC; font-weight: 600; font-size: 13px; color: #284269; cursor: pointer">COMSOL (.MPH)</button>
+                    <button type="button" onClick="generarYDescargar('cad')" style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; background: #F8FAFC; font-weight: 600; font-size: 13px; color: #284269; cursor: pointer">CAD (.DXF)</button>
+                    <button type="button" onClick="generarYDescargar('gerber')" style="padding: 10px; border: 1px solid #CBD5E1; border-radius: 8px; background: #F8FAFC; font-weight: 600; font-size: 13px; color: #284269; cursor: pointer">Gerber (PCB)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Informativo (A la derecha) -->
+    <div style="flex: 1 1 440px; background: #284269; border-radius: 16px; padding: 32px; color: #FFFFFF; display: flex; flex-direction: column; gap: 20px">
+        <h3 style="margin: 0; font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700;">{{t.simTitle}}</h3>
+        <p style="margin: 0; color: #C9D7EE; font-size: 15px; line-height: 1.6;">
+            {{t.simDesc}}
+        </p>
+
+        <!-- Barra de carga al generar / descargar -->
+        <div id="download-progress-box" style="display: none; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.16); border-radius: 12px; padding: 14px 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #E3EAF4; margin-bottom: 8px;">
+                <span id="download-status-text">Generating & downloading geometry...</span>
+                <span id="download-percent-text">0%</span>
+            </div>
+            <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.14); border-radius: 999px; overflow: hidden;">
+                <div id="download-progress-bar" style="width: 0%; height: 100%; background: #93B4ED; border-radius: 999px; transition: width 0.25s ease;"></div>
+            </div>
+        </div>
+
+        <!-- Resultado de corriente predicha -->
+        <div id="current-result-box" style="background: rgba(15, 23, 42, 0.28); border: 1px solid rgba(201, 215, 238, 0.22); border-radius: 12px; padding: 16px 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+            <div>
+                <span style="display: block; font-family: 'IBM Plex Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #93B4ED;">
+                    {{t.predictedCurrentLabel}}
+                </span>
+                <span id="current-meta-text" style="display: block; font-size: 12px; color: #C9D7EE; margin-top: 4px;">
+                    {{t.waitingCalcText}}
+                </span>
+            </div>
+            <div id="current-value-text" style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; color: #FFFFFF; white-space: nowrap;">
+                -- A
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>
+</section>
+<!-- Team Section -->
+<style>
+    #team {
+        padding: 100px 0 90px;
+        background: #F5F7FB;
         overflow: hidden;
-        background: white;
-        box-shadow: 0 8px 24px rgba(40, 66, 105, 0.08);
+    }
+
+    .team-heading {
+        max-width: 1200px;
+        margin: 0 auto 48px;
+        padding: 0 24px;
+    }
+
+    /* Full-width horizontal photo carousel */
+    .team-marquee {
+        width: 100vw;
+        margin-left: calc(50% - 50vw);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .team-track {
+        display: flex;
+        width: max-content;
+        animation: teamMoveRight 65s linear infinite;
         will-change: transform;
     }
 
-    .photo-1 {
-        animation: drift1 6s ease-in-out infinite alternate;
+    .team-marquee:hover .team-track,
+    .team-marquee:focus-within .team-track {
+        animation-play-state: paused;
     }
 
-    .photo-2 {
-        animation: drift2 8s ease-in-out infinite alternate;
+    .team-marquee-group {
+        display: flex;
+        flex-shrink: 0;
+        gap: 18px;
+        padding-right: 18px;
     }
 
-    .photo-3 {
-        animation: drift3 7s ease-in-out infinite alternate;
+    /* Rectangular cards */
+    .team-card {
+        width: 220px;
+        height: 280px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        background: #DCE3EE;
+        cursor: pointer;
     }
 
-    .photo-4 {
-        animation: drift4 9s ease-in-out infinite alternate;
+    .team-card img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+        transition: transform 0.45s ease;
     }
 
-    .photo-5 {
-        animation: drift5 7.5s ease-in-out infinite alternate;
-    }
-
-    .photo-6 {
-        animation: drift6 8.5s ease-in-out infinite alternate;
-    }
-
-    .photo-7 {
-        animation: drift7 6.5s ease-in-out infinite alternate;
-    }
-
-    .photo-8 {
-        animation: drift8 9.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes drift1 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(25px, -18px);
-        }
-    }
-
-    @keyframes drift2 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(-22px, 25px);
-        }
-    }
-
-    @keyframes drift3 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(20px, 22px);
-        }
-    }
-
-    @keyframes drift4 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(-25px, -15px);
-        }
-    }
-
-    @keyframes drift5 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(23px, 18px);
-        }
-    }
-
-    @keyframes drift6 {
-        from {
-            transform: translate(0, 0);
-        }
-
-        to {
-            transform: translate(-20px, -22px);
-        }
-    }
-
-    @keyframes drift7 {
-        from {
-            transform: translate(26px, 0);
-        }
-
-        to {
-            transform: translate(-5px, -20px);
-        }
-    }
-
-    @keyframes drift8 {
-        from {
-            transform: translate(-15px, 10px);
-        }
-
-        to {
-            transform: translate(12px, 28px);
-        }
-    }
-
-</style>
-</head>
-
-
-<body class="bg-white text-[#284269]">
-
-    <!-- Header -->
-<header
-    id="main-header"
-    class="fixed top-0 left-0 right-0 z-50
-           h-16 border-b border-slate-200 bg-white
-           flex items-center justify-between px-6
-           transition-transform duration-300">
-
-    <div class="flex items-center gap-4">
-
-        <!-- Menu -->
-        <button
-            onclick="toggleSidebar()">
-
-            <i class="fa-solid fa-bars text-xl"></i>
-
-        </button>
-
-    </div>
-
-
-    <!-- Header information -->
-
-    <div class="flex items-center">
-        <img
-            src="/static/images/ibio.png"
-            alt="Universidad de los Andes"
-            class="h-[3.9rem] w-auto object-contain">
-    </div>
-
-</header>
-
-
-
-    <!-- Sidebaf -->
-
-    <aside
-        id="sidebar"
-        class="fixed left-0 top-16 bottom-0 w-64
-               bg-[#284269] text-white
-               transform -translate-x-full
-               transition-transform duration-300
-               z-50">
-
-        <div class="p-6">
-
-            <div class="flex justify-between items-center mb-8">
-
-                <span
-                    class="text-xs uppercase tracking-widest
-                           text-blue-200">
-
-                    Navigation
-
-                </span>
-
-                <button onclick="toggleSidebar()">
-
-                    <i class="fa-solid fa-xmark"></i>
-
-                </button>
-
-            </div>
-
-
- <nav class="space-y-2">
-
-    <a
-        href="#home"
-        onclick="toggleSidebar()"
-        class="block px-4 py-3 rounded-lg
-               hover:bg-white/10 transition">
-
-        <i class="fa-solid fa-house mr-3"></i>
-        Home
-
-    </a>
-
-
-    <a
-        href="#why"
-        onclick="toggleSidebar()"
-        class="block px-4 py-3 rounded-lg
-               hover:bg-white/10 transition">
-
-        <i class="fa-solid fa-lightbulb mr-3"></i>
-        Why Microheater Design?
-
-    </a>
-
-
-
-
-    <a
-        href="#how"
-        onclick="toggleSidebar()"
-        class="block px-4 py-3 rounded-lg
-               hover:bg-white/10 transition">
-
-        <i class="fa-solid fa-pen-ruler mr-3"></i>
-         Designer
-
-    </a>
-
-
-    <a
-        href="#team"
-        onclick="toggleSidebar()"
-        class="block px-4 py-3 rounded-lg
-               hover:bg-white/10 transition">
-
-        <i class="fa-solid fa-users mr-3"></i>
-        Team
-
-    </a>
-
-</nav>
-        </div>
-
-    </aside>
-
-
-
-    <!-- Landing -->
-
-
-    <main id="main-content">
-
-        <!-- hero -->
-   
-
-        <section
-            id="home"
-            class="min-h-[calc(100vh-4rem)]
-                   flex items-center
-                   px-8 md:px-16 lg:px-24
-                   bg-white">
-
-
-            <div class="max-w-7xl mx-auto w-full">
-
-                <div
-                    class="grid lg:grid-cols-2
-                           gap-16 lg:gap-20
-                           items-center">
-
-
-
-    <div>
-
-
-    <h1 class="text-5xl md:text-6xl lg:text-7xl
-            font-extrabold leading-[0.95]
-            tracking-tight text-[#284269]">
-
-    Define.
-    <br>
-
-    Predict.
-    <br>
-
-    <span class="text-[#2E58A6]">
-        Fabricate.
-    </span>
-
-    </h1>
-
-    <p
-    class="mt-8
-            text-lg
-            text-slate-500
-            leading-relaxed
-            max-w-xl">
-
-    Enter the desired temperature and the
-    dimensions of your plate. Microheater Design uses
-    machine learning to predict the microheater
-    parameters required to achieve the target
-    thermal response.
-
-    </p>
-
-
-
-
-
-    </div>
-
-
-<div class="relative -mt-1">
-
-
-
-                                                    <div class="flex items-center gap-3 mb-6">
-
-                        
-
-                            <span
-                                class="text-sm font-semibold
-                                       tracking-widest uppercase
-                                       text-[#2E58A6]">
-
-                                From target temperature to microheater design
-
-                            </span>
-
-
-                        </div>
-
-            
-
-
-                                <img
-                                    src="/static/images/microheater.png"
-                                    alt="Microheater research prototype"
-                                    class="hero-image w-full
-                                        object-contain">
-
-
-                                
-                                                                <!-- Small label -->
-
-
-
-
-                                
-                                
-
-
-
-    
-
-
-
-
-
-                   
-
-                </div>
-
-            </div>
-
-        </section>
-
-<section
-    id="why"
-    class="pt-2 pb-24
-           px-8 md:px-16
-           bg-white">
-
-   <style>
-    /* Design process animation */
-    .process-step,
-    .process-arrow,
-    .adjust-process {
+    /* Information overlay */
+    .team-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 18px;
+        color: white;
+        background: linear-gradient(
+            to top,
+            rgba(24, 43, 72, 0.97),
+            rgba(24, 43, 72, 0.60),
+            rgba(24, 43, 72, 0.05)
+        );
         opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
-    .process-step {
-        transform: translateX(-20px);
+    .team-card:hover .team-overlay,
+    .team-card:focus .team-overlay,
+    .team-card:focus-within .team-overlay {
+        opacity: 1;
     }
 
-    .adjust-process {
-        transform: translateY(10px);
+    .team-card:hover img,
+    .team-card:focus img,
+    .team-card:focus-within img {
+        transform: scale(1.06);
     }
 
-    /* Animation starts when the section enters the viewport */
-    .why-visible .process-step {
-        animation: processIn 0.7s ease-out forwards;
+    .team-card:focus-visible {
+        outline: 3px solid #2E58A6;
+        outline-offset: -3px;
     }
 
-    .why-visible .process-step.define {
-        animation-delay: 0.2s;
+    .team-name {
+        margin: 0 0 10px;
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.3;
     }
 
-    .why-visible .process-step.evaluate {
-        animation-delay: 0.7s;
+    .team-contact {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
     }
 
-    .why-visible .process-step.compare {
-        animation-delay: 1.2s;
+    .team-contact a {
+        color: #E3EAF4;
+        font-size: 12px;
+        line-height: 1.4;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+        transition: color 0.2s ease;
     }
 
-    .why-visible .process-arrow {
-        animation: arrowIn 0.5s ease-out forwards;
+    .team-contact a:hover {
+        color: white;
+        text-decoration: underline;
     }
 
-    .why-visible .process-arrow.first {
-        animation-delay: 0.5s;
-    }
-
-    .why-visible .process-arrow.second {
-        animation-delay: 1s;
-    }
-
-    .why-visible .adjust-process {
-        animation: adjustIn 0.6s ease-out forwards;
-        animation-delay: 1.7s;
-    }
-
-    @keyframes processIn {
+    /* Movement from left to right */
+    @keyframes teamMoveRight {
+        from {
+            transform: translateX(-50%);
+        }
         to {
-            opacity: 1;
             transform: translateX(0);
         }
     }
 
-    @keyframes arrowIn {
-        to {
-            opacity: 1;
+    @media (max-width: 600px) {
+        #team {
+            padding: 72px 0;
+        }
+
+        .team-heading {
+            margin-bottom: 32px;
+        }
+
+        .team-card {
+            width: 235px;
+            height: 165px;
+        }
+
+        .team-name {
+            font-size: 15px;
+        }
+
+        .team-contact a {
+            font-size: 11px;
         }
     }
 
-    @keyframes adjustIn {
-        to {
-            opacity: 1;
-            transform: translateY(0);
+    @media (prefers-reduced-motion: reduce) {
+        .team-track {
+            animation: none;
+        }
+
+        .team-card img,
+        .team-overlay {
+            transition: none;
         }
     }
-
-    
 </style>
 
+<section id="team">
 
-    <div class="max-w-7xl mx-auto">
+    <!-- Team heading -->
+    <div class="team-heading">
 
+        <p style="margin: 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; text-transform: uppercase; color: #2E58A6;">
+            [03] {{t.teamEyebrow}}
+        </p>
 
-        <!--  introo -->
-        <div class="max-w-5xl mx-auto text-center">
+        <h2 style="margin: 18px 0 20px; font-family: 'Space Grotesk', sans-serif; font-size: 40px; font-weight: 700; color: #284269; line-height: 1.1;">
+            {{t.teamTitle}}
+        </h2>
 
-            <span
-                class="text-sm
-                       font-semibold
-                       tracking-widest
-                       uppercase
-                       text-[#2E58A6]">
-                Why Microheater Design?
-            </span>
-
-            <h2
-                class="mt-4
-                       text-4xl md:text-5xl
-                       font-bold
-                       leading-tight
-                       text-[#284269]">
-                Designing a microheater should not start
-                <br class="hidden md:block">
-                with trial and error.
-            </h2>
-
-            <p
-                class="mt-7
-                       text-lg
-                       text-slate-500
-                       leading-relaxed
-                       max-w-3xl
-                       mx-auto">
-                Microheater performance depends strongly on its geometry
-                and operating conditions. Finding a suitable design can
-                require repeated simulations, parameter adjustments,
-                and testing.
-            </p>
-
-        </div>
-
-
-        <!-- Diseño -->
-
-        <div
-            class="mt-16
-                   max-w-6xl
-                   mx-auto">
-
-            <div
-                class="flex
-                       flex-col
-                       md:flex-row
-                       items-center
-                       justify-between
-                       gap-6">
-
-
-                <!-- def -->
-                <div
-                    class="flex-1
-                           text-center
-                           process-step
-                           define">
-
-                    <div
-                        class="w-14 h-14
-                               mx-auto
-                               flex items-center justify-center
-                               rounded-full
-                               bg-slate-100
-                               text-[#2E58A6]">
-
-                        <i class="fa-solid fa-pen-ruler text-xl"></i>
-
-                    </div>
-
-                    <h3
-                        class="mt-5
-                               text-xl
-                               font-bold
-                               text-[#284269]">
-                        Define
-                    </h3>
-
-                    <p
-                        class="mt-2
-                               text-sm
-                               text-slate-500
-                               leading-relaxed">
-                        Define the microheater geometry.
-                    </p>
-
-                </div>
-
-
-                <!-- flechita1 -->
-                <div
-                    class="process-arrow
-                           first
-                           hidden md:block
-                           text-slate-300">
-
-                    <i class="fa-solid fa-arrow-right"></i>
-
-                </div>
-
-
-                <!-- evaluar -->
-                <div
-                    class="flex-1
-                           text-center
-                           process-step
-                           evaluate">
-
-                    <div
-                        class="w-14 h-14
-                               mx-auto
-                               flex items-center justify-center
-                               rounded-full
-                               bg-slate-100
-                               text-[#2E58A6]">
-
-                        <i class="fa-solid fa-flask-vial text-xl"></i>
-
-                    </div>
-
-                    <h3
-                        class="mt-5
-                               text-xl
-                               font-bold
-                               text-[#284269]">
-                        Evaluate
-                    </h3>
-
-                    <p
-                        class="mt-2
-                               text-sm
-                               text-slate-500
-                               leading-relaxed">
-                        Simulate or test its thermal response.
-                    </p>
-
-                </div>
-
-
-                <!-- flechita2 -->
-                <div
-                    class="process-arrow
-                           second
-                           hidden md:block
-                           text-slate-300">
-
-                    <i class="fa-solid fa-arrow-right"></i>
-
-                </div>
-
-
-                <!-- comparar -->
-                <div
-                    class="flex-1
-                           text-center
-                           process-step
-                           compare">
-
-                    <div
-                        class="w-14 h-14
-                               mx-auto
-                               flex items-center justify-center
-                               rounded-full
-                               bg-slate-100
-                               text-[#2E58A6]">
-
-                        <i class="fa-solid fa-temperature-half text-xl"></i>
-
-                    </div>
-
-                    <h3
-                        class="mt-5
-                               text-xl
-                               font-bold
-                               text-[#284269]">
-                        Compare
-                    </h3>
-
-                    <p
-                        class="mt-2
-                               text-sm
-                               text-slate-500
-                               leading-relaxed">
-                        Check whether the target temperature is reached.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-
-            <!-- repetir -->
-    
-            <div
-                class="mt-12
-                       flex
-                       flex-col
-                       items-center
-                       adjust-process">
-
-                <div
-                    class="text-[#2E58A6]
-                           mb-3">
-
-                    <i class="fa-solid fa-arrow-turn-up text-lg"></i>
-
-                </div>
-
-                <div
-                    class="flex
-                           items-center
-                           gap-3
-                           text-sm
-                           text-slate-500
-                           text-center">
-
-                    <i
-                        class="fa-solid fa-rotate-left
-                               text-[#2E58A6]">
-                    </i>
-
-                    <span>
-                        If the target is not reached,
-                        adjust the design and repeat.
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- inverso -->
-
-        <div
-            class="mt-20
-                   max-w-4xl
-                   mx-auto
-                   text-center">
-
-            <p
-                class="text-2xl md:text-3xl
-                       font-semibold
-                       leading-relaxed
-                       text-[#284269]">
-
-                Microheater Design approaches this problem
-                <span class="text-[#2E58A6]">
-                    in reverse.
-                </span>
-
-            </p>
-
-            <p
-                class="mt-5
-                       text-lg
-                       text-slate-500
-                       leading-relaxed">
-
-                Instead of starting with a geometry and asking what
-                temperature it will produce, the system starts with the
-                desired thermal response and predicts a suitable
-                microheater design.
-
-            </p>
-
-        </div>
+        <p style="color: #5B6B82; font-size: 16px; line-height: 1.7; max-width: 650px;">
+            {{t.teamSubtitle}}
+        </p>
 
     </div>
+
+    <!-- Full-width moving photos -->
+    <div class="team-marquee">
+
+        <div class="team-track">
+
+            <!-- First set -->
+            <div class="team-marquee-group">
+
+                <!-- 01 David -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member1.jpg" alt="David S. Rodríguez">
+
+                    <div class="team-overlay">
+                        <p class="team-name">David S. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:ds.rodriguezq1@uniandes.edu.co">
+                                ds.rodriguezq1@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/david-santiago-rodr%C3%ADguez-quiroga-249670312/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 02 Ana Español -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member2.png" alt="Ana S. Español">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Ana S. Español</p>
+                        <div class="team-contact">
+                            <a href="mailto:a.espanol@uniandes.edu.co">
+                                a.espanol@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/ana-sofia-espa%C3%B1ol/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 03 Ana Acosta -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member3.jpg" alt="Ana S. Acosta">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Ana S. Acosta</p>
+                        <div class="team-contact">
+                            <a href="mailto:as.acosta@uniandes.edu.co">
+                                as.acosta@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/ana-sofia-acosta-valencia-14131a210/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 04 Carol -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member4.jpg" alt="Carol D. Vergara">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Carol D. Vergara</p>
+                        <div class="team-contact">
+                            <a href="mailto:c.vergaraa@uniandes.edu.co">
+                                c.vergaraa@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/carol-dayanna-vergara-amaya-109b17311/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 05 Daniela -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member5.jpg" alt="Daniela Martínez">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Daniela Martínez</p>
+                        <div class="team-contact">
+                            <a href="mailto:d.martinezm2@uniandes.edu.co">
+                                d.martinezm2@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/daniela-martinez-a2608b266/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 06 Laura -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member6.jpeg" alt="Laura Muñoz">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Laura Muñoz</p>
+                        <div class="team-contact">
+                            <a href="mailto:l.munoze@uniandes.edu.co">
+                                l.munoze@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/laura-valentina-mu%C3%B1oz-estevez/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 07 Cristian -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member8.jpg" alt="Cristian F. Rodríguez">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Cristian F. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:cf.rodriguez@uniandes.edu.co">
+                                cf.rodriguez@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/cristian-felipe-rodriguez-ospino/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 08 Juan -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member7.png" alt="Juan C. Cruz">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Juan C. Cruz</p>
+                        <div class="team-contact">
+                            <a href="mailto:jc.cruz@uniandes.edu.co">
+                                jc.cruz@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/juan-c-cruz-ph-d-p-e-91b475298/" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 09 Juan E. Rodríguez -->
+                <div class="team-card" tabindex="0">
+                    <img src="/static/images/team/member9.png" alt="Juan E. Rodríguez">
+
+                    <div class="team-overlay">
+                        <p class="team-name">Juan E. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:j.rodriguezo@uniandes.edu.co">
+                                j.rodriguezo@uniandes.edu.co
+                            </a>
+                            <a href="https://www.linkedin.com/in/juan-esteban-rodriguez-ospino/?locale=es" target="_blank" rel="noopener">
+                                LinkedIn ↗
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Second identical set for seamless loop -->
+            <div class="team-marquee-group" aria-hidden="true">
+
+                <div class="team-card">
+                    <img src="/static/images/team/member1.jpg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">David S. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:ds.rodriguezq1@uniandes.edu.co" tabindex="-1">ds.rodriguezq1@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/david-santiago-rodr%C3%ADguez-quiroga-249670312/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member2.png" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Ana S. Español</p>
+                        <div class="team-contact">
+                            <a href="mailto:a.espanol@uniandes.edu.co" tabindex="-1">a.espanol@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/ana-sofia-espa%C3%B1ol/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member3.jpg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Ana S. Acosta</p>
+                        <div class="team-contact">
+                            <a href="mailto:as.acosta@uniandes.edu.co" tabindex="-1">as.acosta@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/ana-sofia-acosta-valencia-14131a210/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member4.jpg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Carol D. Vergara</p>
+                        <div class="team-contact">
+                            <a href="mailto:c.vergaraa@uniandes.edu.co" tabindex="-1">c.vergaraa@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/carol-dayanna-vergara-amaya-109b17311/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member5.jpg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Daniela Martínez</p>
+                        <div class="team-contact">
+                            <a href="mailto:d.martinezm2@uniandes.edu.co" tabindex="-1">d.martinezm2@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/daniela-martinez-a2608b266/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member6.jpeg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Laura Muñoz</p>
+                        <div class="team-contact">
+                            <a href="mailto:l.munoze@uniandes.edu.co" tabindex="-1">l.munoze@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/laura-valentina-mu%C3%B1oz-estevez/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member8.jpg" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Cristian F. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:cf.rodriguez@uniandes.edu.co" tabindex="-1">cf.rodriguez@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/cristian-felipe-rodriguez-ospino/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="/static/images/team/member7.png" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Juan C. Cruz</p>
+                        <div class="team-contact">
+                            <a href="mailto:jc.cruz@uniandes.edu.co" tabindex="-1">jc.cruz@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/juan-c-cruz-ph-d-p-e-91b475298/" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="team-card">
+                    <img src="/static/images/team/member9.png" alt="">
+                    <div class="team-overlay">
+                        <p class="team-name">Juan E. Rodríguez</p>
+                        <div class="team-contact">
+                            <a href="mailto:j.rodriguezo@uniandes.edu.co" tabindex="-1">j.rodriguezo@uniandes.edu.co</a>
+                            <a href="https://www.linkedin.com/in/juan-esteban-rodriguez-ospino/?locale=es" tabindex="-1" target="_blank" rel="noopener">LinkedIn ↗</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
 </section>
+<!-- End Team Section -->
 
 
-<!--Funcional -->
-
-
-<section
-    id="how"
-    class="py-8
-           px-8 md:px-16
-           bg-white
-           border-slate-200">
-
-    <div class="max-w-7xl mx-auto">
-
-        <div class="mb-14 text-center">
-
-            <span
-                class="text-sm
-                       font-semibold
-                       tracking-widest
-                       uppercase
-                       text-[#2E58A6]">
-
-                Workflow
-
-            </span>
-
-
-            <h2
-                class="mt-3
-                       text-4xl
-                       font-bold
-                       text-[#284269]">
-
-                From parameters to fabrication.
-
-            </h2>
-
-
-        </div>
-
-
-<div
-    class="grid
-           lg:grid-cols-2
-           gap-0
-           items-stretch">
-
-
-    <div
-        class="lg:border-r
-           lg:border-slate-200
-           lg:pr-12
-           overflow-hidden">
-
-
-        <!-- p1 -->
-
-        <div
-            class="p-7
-                   border-b
-                   border-slate-200
-                   flex
-                   gap-6">
-
-            <span
-                class="text-3xl
-                       font-bold
-                       text-[#8BA8D1]
-                       leading-none">
-
-                01
-
-            </span>
-
-
-            <div>
-
-                <h3
-                    class="font-bold
-                           text-lg
-                           text-[#284269]">
-
-                    Input
-
-                </h3>
-
-
-                <p
-                    class="mt-2
-                           text-sm
-                           text-slate-500
-                           leading-relaxed">
-
-                    Define the target temperature and
-                    physical dimensions of the plate.
-
-                </p>
-
+<<!-- Footer -->
+<footer style="background: #284269; color: #FFFFFF; border-top: 1px solid rgba(255,255,255,0.1)">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 40px;">
+        
+        <!-- Contenido Superior del Footer -->
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 40px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.12);">
+            
+            <!-- Izquierda: Título y Botón CTA -->
+            <div style="max-width: 480px;">
+                <h2 style="margin: 0 0 24px; font-family: 'Space Grotesk', sans-serif; font-size: 36px; font-weight: 700; line-height: 1.15; color: #FFFFFF;">
+                    {{t.footerTitle}}
+                </h2>
+                <a href="#designer" style="display: inline-block; background: #FFFFFF; color: #284269; font-family: 'IBM Plex Sans', sans-serif; font-weight: 600; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: filter 0.2s;">
+                    {{t.footerCta}}
+                </a>
             </div>
 
-        </div>
-
-
-
-        <!-- p2 -->
-
-        <div
-            class="p-7
-                   border-b
-                   border-slate-200
-                   flex
-                   gap-6">
-
-            <span
-                class="text-3xl
-                       font-bold
-                       text-[#8BA8D1]
-                       leading-none">
-
-                02
-
-            </span>
-
-
-            <div>
-
-                <h3
-                    class="font-bold
-                           text-lg
-                           text-[#284269]">
-
-                    Design
-
-                </h3>
-
-
-                <p
-                    class="mt-2
-                           text-sm
-                           text-slate-500
-                           leading-relaxed">
-
-                    The system determines the
-                    microheater geometry for the target.
-
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- p3 -->
-
-        <div
-            class="p-7
-                   border-b
-                   border-slate-200
-                   flex
-                   gap-6">
-
-            <span
-                class="text-3xl
-                       font-bold
-                       text-[#8BA8D1]
-                       leading-none">
-
-                03
-
-            </span>
-
-
-            <div>
-
-                <h3
-                    class="font-bold
-                           text-lg
-                           text-[#284269]">
-
-                    Predict
-
-                </h3>
-
-
-                <p
-                    class="mt-2
-                           text-sm
-                           text-slate-500
-                           leading-relaxed">
-
-                    The machine learning model predicts the microheater geometry required to achieve the target temperature.
-
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- p4 -->
-
-        <div
-            class="p-7
-                   flex
-                   gap-6">
-
-            <span
-                class="text-3xl
-                       font-bold
-                       text-[#8BA8D1]
-                       leading-none">
-
-                04
-
-            </span>
-
-
-            <div>
-
-                <h3
-                    class="font-bold
-                           text-lg
-                           text-[#284269]">
-
-                    Export
-
-                </h3>
-
-
-                <p
-                    class="mt-2
-                           text-sm
-                           text-slate-500
-                           leading-relaxed">
-
-                    Export the generated geometry in different file formats for fabrication and simulation.
-
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-<div class="lg:pl-12 p-8 lg:pt-12 flex flex-col">
-
-    <div>
-        <h3 class="mt-2 text-xl font-bold text-[#284269]">
-            Define your target
-        </h3>
-    </div>
-
-    <!-- Param -->
-    <div class="mt-7 space-y-5">
-
-
-    
-        <div>
-            <label class="block text-sm font-medium text-[#284269] mb-2">
-                Plate dimensions
-            </label>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
-                    <span class="text-xs text-slate-400 block">X (mm)</span>
-                    <input type="number" id="x_length" value="30.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
+            <!-- Derecha: Columnas de Enlaces e Institución -->
+            <div style="display: flex; flex-wrap: wrap; gap: 60px;">
+                
+                <!-- Columna Recursos -->
+                <div>
+                    <h4 style="margin: 0 0 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #93B4ED;">
+                        {{t.footerResourcesTitle}}
+                    </h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px;">
+                        <li><a href="#" style="color: #E3EAF4; text-decoration: none;">{{t.footerPaper}}</a></li>
+                        <li><a href="https://github.com/Laura1104/microheater-design" style="color: #E3EAF4; text-decoration: none;">{{t.footerGithub}}</a></li>
+                    </ul>
                 </div>
 
-                <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
-                    <span class="text-xs text-slate-400 block">Y (mm)</span>
-                    <input type="number" id="y_length" value="35.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
+                <!-- Columna Institución -->
+                <div>
+                    <h4 style="margin: 0 0 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #93B4ED;">
+                        {{t.footerInstitutionTitle}}
+                    </h4>
+                    <p style="margin: 0 0 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; line-height: 1.5; color: #E3EAF4;">
+                        Universidad de los Andes<br>
+                        {{t.footerDept}}<br>
+                        {{t.footerCity}}
+                    </p>
                 </div>
+
             </div>
         </div>
 
-        <!-- Mientras tengo el modelo -->
-        <div class="grid grid-cols-2 gap-3">
-            <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
-                <span class="text-xs text-slate-400 block">Loops (n)</span>
-                <input type="number" id="n" value="6" step="2" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
-            </div>
-
-            <div class="border border-slate-200 rounded-lg px-4 py-2 bg-white">
-                <span class="text-xs text-slate-400 block">Gap lz (mm)</span>
-                <input type="number" id="lz" value="3.0" step="0.1" class="w-full outline-none text-slate-700 font-medium bg-transparent mt-1">
-            </div>
+        <!-- Barra Inferior de Copyright -->
+        <div style="padding-top: 32px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #93B4ED; letter-spacing: 0.05em;">
+            <span>{{t.footerCopyright}}</span>
+            <span>{{t.footerUniLine}}</span>
         </div>
-
 
     </div>
-
-<!-- EExportar -->
-    <div class="mt-6">
-        <span class="text-sm font-semibold tracking-widest uppercase text-[#8BA8D1]">
-            Export geometry
-        </span>
-
-        <div class="mt-3 grid grid-cols-3 gap-3">
-            <button onclick="generarYDescargar('comsol')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
-                COMSOL (.MPH)
-            </button>
-
-            <button onclick="generarYDescargar('cad')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
-                CAD (.DXF)
-            </button>
-
-            <button onclick="generarYDescargar('gerber')" class="py-3 border border-slate-200 rounded-lg text-sm font-medium text-[#284269] hover:bg-slate-50 transition">
-                Gerber (PCB)
-            </button>
-        </div>
-    </div>
+</footer>
 
 </div>
-</div>
-<!-- equipo -->
-<section
-    id="team"
-    class="relative min-h-[720px]
-           py-24
-           px-8 md:px-16
-           bg-white
-           border-b border-slate-200
-           overflow-hidden">
+{% endraw %}
+</template>
 
-    <div
-        class="max-w-7xl mx-auto
-               min-h-[570px]
-               grid
-               lg:grid-cols-[0.9fr_1.1fr]
-               items-center">
+<!-- Script de React personalizado (Motor del profesor para los puntos interactivos y renderizado) -->
+<script>
+(function () {
+  class DCLogic {
+    constructor(props) { this.props = props || {}; this.state = {}; }
+    setState(p) { const prev = this.state; this.state = Object.assign({}, prev, typeof p === 'function' ? p(prev, this.props) : p); schedule(prev); }
+  }
+  window.DCLogic = DCLogic;
 
+  let inst = null, tpl = null, root = null, pending = false;
+  function schedule(prev) {
+    if (pending) return;
+    pending = true;
+    queueMicrotask(() => { pending = false; update(); });
+  }
 
-        <div
-            class="relative z-20
-                   max-w-xl
-                   pr-8 lg:pr-12">
+  const lookup = (path, scope) => {
+    path = path.trim();
+    if (path === 'true') return true; if (path === 'false') return false;
+    let v = scope;
+    for (const p of path.split('.')) { if (v == null) return undefined; v = v[p]; }
+    return v;
+  }
+  const interp = (str, scope) => str.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (m, p) => { const v = lookup(p, scope); return v == null ? '' : String(v); });
 
-            <span
-                class="text-sm
-                       font-semibold
-                       tracking-widest
-                       uppercase
-                       text-[#8BA8D1]">
-                Team members
-            </span>
-
-            <h2
-                class="mt-4
-                       text-5xl md:text-6xl
-                       font-bold
-                       leading-[0.95]
-                       tracking-tight
-                       text-[#284269]">
-                The people<br>
-                behind <span class="text-[#2E58A6]">Microheater Design.</span>
-            </h2>
-
-            <p
-                class="mt-7
-                       max-w-md
-                       text-base
-                       text-slate-500
-                       leading-relaxed">
-                Eight team members combining engineering,
-                software development, machine learning,
-                and experimental validation.
-            </p>
-
-
-        <div
-            class="mt-10
-                grid
-                sm:grid-cols-2
-                gap-x-8
-                gap-y-5">
-
-            <!-- 01 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        David S.Rodríguez
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:ds.rodriguezq1@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/david-santiago-rodr%C3%ADguez-quiroga-249670312/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 02 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Ana S. Español
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:a.espanol@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/ana-sofia-espa%C3%B1ol/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 03 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Ana S. Acosta
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:as.acosta@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/ana-sofia-acosta-valencia-14131a210/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 04 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Carol D. Vergara
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:c.vergaraa@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/carol-dayanna-vergara-amaya-109b17311/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 05 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Daniela Martínez
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:d.martinezm2@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/daniela-martinez-a2608b266/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 06 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Laura Muñoz
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:l.munoze@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/laura-valentina-mu%C3%B1oz-estevez/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 07 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Cristian F. Rodríguez
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:cf.rodriguez@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/cristian-felipe-rodriguez-ospino/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- 08 -->
-            <div class="flex items-start gap-3">
-                <div>
-                    <p class="font-semibold text-[#284269] text-center">
-                        Juan C. Cruz
-                    </p>
-
-                    <div class="mt-2 flex justify-center gap-4 text-slate-400">
-                        <a
-                            href="mailto:jc.cruz@uniandes.edu.co"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="Email">
-                            <i class="fa-regular fa-envelope"></i>
-                        </a>
-
-                        <a
-                            href="https://www.linkedin.com/in/juan-c-cruz-ph-d-p-e-91b475298/"
-                            target="_blank"
-                            rel="noopener"
-                            class="hover:text-[#2E58A6] transition"
-                            aria-label="LinkedIn">
-                            <i class="fa-brands fa-linkedin-in"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-
-    </div>      
-
-
-        <!-- fotitos -->
-        <div
-            class="team-wall
-                   relative
-                   h-[570px]
-                   -mr-2
-                   lg:-mr-12">
-
-            <div
-                class="absolute inset-8
-                       grid
-                       grid-cols-4
-                       gap-6
-                       items-center
-                       [transform:perspective(900px)_rotateY(-8deg)]">
-
-                <!-- 01 -->
-                <div class="team-photo photo-1">
-                    <img
-                        src="/static/images/team/member1.jpg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!--  02 -->
-                <div class="team-photo photo-2 mt-12">
-                    <img
-                        src="/static/images/team/member2.png"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!--  03 -->
-                <div class="team-photo photo-3 -mt-10">
-                    <img
-                        src="/static/images/team/member3.jpg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!-- 04 -->
-                <div class="team-photo photo-4 mt-8">
-                    <img
-                        src="/static/images/team/member4.jpg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!-- 05 -->
-                <div class="team-photo photo-5 -mt-6">
-                    <img
-                        src="/static/images/team/member5.jpg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!-- 06 -->
-                <div class="team-photo photo-6 mt-14">
-                    <img
-                        src="/static/images/team/member6.jpeg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!-- 07 -->
-                <div class="team-photo photo-7 -mt-8">
-                    <img
-                        src="/static/images/team/member7.png"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-                <!-- 08 -->
-                <div class="team-photo photo-8 mt-6">
-                    <img
-                        src="/static/images/team/member8.jpg"
-                        alt="Team member"
-                        class="w-full h-full object-cover">
-                </div>
-
-            </div>
-
-
-            <!-- Difuminado -->
-            <div
-                class="absolute inset-x-0 top-3
-                       h-24
-                       z-10
-                       pointer-events-none
-                       bg-gradient-to-b
-                       from-white
-                       to-transparent">
-            </div>
-
-
-
-        </div>
-
-    </div>
-</section>
-
-    <!-- JAVASCRIPT -->
-
-
-    <script>
-        // 1. Control del Sidebar
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            sidebar.classList.toggle("-translate-x-full");
+  function build(n, scope, parent) {
+    if (n.nodeType === 3) { parent.appendChild(document.createTextNode(interp(n.nodeValue, scope))); return; }
+    if (n.nodeType !== 1) return;
+    const tag = n.localName;
+    if (tag === 'sc-for') {
+      const list = lookup(n.getAttribute('list'), scope) || [];
+      const as = n.getAttribute('as') || 'item';
+      list.forEach((it, i) => { const s = Object.create(scope); s[as] = it; s.$index = i; n.childNodes.forEach((c) => build(c, s, parent)); });
+      return;
+    }
+    const el = document.createElement(tag);
+    for (const a of n.attributes) {
+      const m = a.value.match(/^\s*\{\{\s*([^}]+?)\s*\}\}\s*$/);
+      if (m) {
+        const v = lookup(m[1], scope);
+        if (a.name === 'ref' && typeof v === 'function') { el.__ref = v; continue; }
+        if (a.name.startsWith('on') && typeof v === 'function') {
+          let ev = a.name.slice(2).toLowerCase(); if (ev === 'change') ev = 'input';
+          el.addEventListener(ev, v); continue;
         }
+        if (v != null) el.setAttribute(a.name, String(v));
+      } else el.setAttribute(a.name, interp(a.value, scope));
+    }
+    n.childNodes.forEach((c) => build(c, scope, el));
+    parent.appendChild(el);
+  }
 
-        // 2. Generación y Descarga de Archivos (CAD, COMSOL, Gerber)
+  function callRefs() {
+    const walk = (node, fn) => { if (node.nodeType === 1) { fn(node); node.childNodes.forEach(c => walk(c, fn)); } };
+    walk(root, (el) => { if (el.__ref) el.__ref(el); });
+  }
+
+  function fresh() {
+    const frag = document.createDocumentFragment();
+    const vals = inst.renderVals();
+    tpl.content.childNodes.forEach((c) => build(c, vals, frag));
+    return frag;
+  }
+  function update() { root.innerHTML = ''; root.appendChild(fresh()); callRefs(); }
+
+  window.mountDC = function (Component) {
+    tpl = document.getElementById('xdc');
+    root = document.getElementById('app');
+    inst = new Component({});
+    update();
+    if (inst.componentDidMount) inst.componentDidMount();
+  };
+})();
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { lang: 'en', temp: '20.0', x: '30.0', y: '15.0', estrategia: 'A', dec: '' };
+    this.mouse = { x: -9999, y: -9999 };
+    this.setDotCanvas = (el) => { this.dotCanvas = el; };
+  }
+
+  syncDesignerInputs() {
+  const xEl = document.getElementById('x_length');
+  const yEl = document.getElementById('y_length');
+  const tEl = document.getElementById('temp_target');
+  const eEl = document.getElementById('estrategia');
+  if (xEl) this.state.x = xEl.value;
+  if (yEl) this.state.y = yEl.value;
+  if (tEl) this.state.temp = tEl.value;
+  if (eEl) this.state.estrategia = eEl.value;
+}
+
+  componentDidMount() {
+    this.decrypt();
+    this.initWhyObserver();
+    const loop = (ts) => { this.draw(ts || 0); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+componentDidUpdate() {
+  this.initWhyObserver();
+  const s = this.state;
+  const xEl = document.getElementById('x_length');
+  const yEl = document.getElementById('y_length');
+  const tEl = document.getElementById('temp_target');
+  const eEl = document.getElementById('estrategia');
+
+  if (xEl && s.x !== undefined) xEl.value = s.x;
+  if (yEl && s.y !== undefined) yEl.value = s.y;
+  if (tEl && s.temp !== undefined) tEl.value = s.temp;
+  if (eEl && s.estrategia !== undefined) eEl.value = s.estrategia;
+}
+
+  initWhyObserver() {
+    const whySection = document.getElementById('why');
+    if (whySection && !whySection.classList.contains('why-visible')) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              whySection.classList.add('why-visible');
+              observer.unobserve(whySection);
+            }
+          });
+        },
+        { threshold: 0.25 }
+      );
+      observer.observe(whySection);
+    }
+  }
+
+decrypt() {
+  clearInterval(this.decT);
+  const lang = (this.state && this.state.lang) || 'en';
+  const d = this.dict()[lang] || this.dict().en;
+  const target = d.dec || ' ML INVERSE DESIGN ';
+  let i = 0;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/<>';
+  this.decT = setInterval(() => {
+    i += 1.6;
+    const shown = target
+      .split('')
+      .map((c, k) => (k < i || c === ' ' || c === '[' || c === ']') ? c : chars[Math.floor(Math.random() * chars.length)])
+      .join('');
+    this.setState({ dec: shown });
+    if (i >= target.length) {
+      clearInterval(this.decT);
+      this.setState({ dec: target });
+    }
+  }, 32);
+}
+
+  draw(ts) {
+    const dc = this.dotCanvas;
+    if (!dc) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = dc.clientWidth, h = dc.clientHeight;
+    if (!w || !h) return;
+    if (dc.width !== Math.round(w * dpr) || dc.height !== Math.round(h * dpr)) { dc.width = Math.round(w * dpr); dc.height = Math.round(h * dpr); }
+    const g = dc.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, w, h);
+
+    const gap = 26, R = 160; const mx = this.mouse.x, my = this.mouse.y;
+    for (let y = gap / 2; y < h; y += gap) {
+      for (let x = gap / 2; x < w; x += gap) {
+        const dx = x - mx, dy = y - my; const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        const k = d < R ? 1 - d / R : 0;
+        const px = x + (k ? (dx / d) * k * 7 : 0), py = y + (k ? (dy / d) * k * 7 : 0);
+        g.fillStyle = k ? 'rgba(46,88,166,' + (0.22 + 0.68 * k).toFixed(2) + ')' : 'rgba(40,66,105,0.14)';
+        g.beginPath(); g.arc(px, py, 1.3 + k * 1.6, 0, 6.2832); g.fill();
+      }
+    }
+  }
+
+  dict() {
+    return {
+      en: {
+        dec: ' ML INVERSE DESIGN ',
+        announce: 'Research project · Universidad de los Andes ·', announceLink: 'Read the paper [link] →',
+        nav0: 'Why', nav1: 'Designer', nav2: 'Team',
+        h1a: 'Define.', h1b: 'Predict.', h1c: 'Fabricate.',
+        sub: 'Start from the temperature you need. The model predicts heater geometry and drive current.',
+        whyEyebrow: 'Why Microheater Design?', whyTitle: 'Stop iterating. Start from the target.',
+        whyLead: 'Microheater performance depends strongly on its geometry and operating conditions. Finding a suitable design can require repeated simulations, parameter adjustments, and testing.',
+
+whyUsualLoop: 'The usual loop',
+whyLoopSubtitle: 'A trial-and-error approach',
+whyLoop1: 'Guess a geometry',
+whyLoop2: 'Simulate or test it',
+whyLoop3: 'Check the temperature',
+whyLoop4: 'Adjust the design',
+whyLoopFooter: 'Repeat until the design works',
+
+whyToolFlow: 'With Microheater Design',
+whyToolSubtitle: 'A target-driven design approach',
+whyTool1: 'Set the target temperature',
+whyTool2: 'Get the predicted geometry',
+whyTool3: 'Export the geometry files',
+whyToolFooter: 'From target to fabrication files',
+        howEyebrow: 'Designer', howTitle: 'From parameters to fabrication.',
+        formTitle: 'Define your target',
+        teamEyebrow: 'Team', teamTitle: 'The people behind Microheater Design.',
+        whyStep1: 'Define',
+whyStep1Desc: 'Define the microheater geometry.',
+whyStep2: 'Evaluate',
+whyStep2Desc: 'Simulate or test its thermal response.',
+whyStep3: 'Compare',
+whyStep3Desc: 'Check whether the target temperature is reached.',
+whyAdjust: 'If the target is not reached, adjust the design and repeat.',
+whyReverse: 'Microheater Design approaches this problem',
+whyReverseHighlight: 'in reverse.',
+whyReverseDesc: 'Instead of starting with a geometry and asking what temperature it will produce, the system starts with the desired thermal response and predicts a suitable microheater design.',
+plateDimsLabel: 'Plate dimensions (mm)',
+  xWidthLabel: 'X (Width)',
+  yLengthLabel: 'Y (Length)',
+  targetTempLabel: 'Target Temp (°C)',
+  strategyLabel: 'Optimization Strategy',
+  stratA: 'A: Temp Only (Precision)',
+  stratB: 'B: Energy Efficiency',
+  stratC: 'C: High Uniformity',
+  exportGeomLabel: 'Export geometry',
+  simTitle: 'Prediction & Simulation',
+  simDesc: 'The optimization engine computes the ideal geometry using Machine Learning based on the selected strategy, validating physical constraints before generating manufacturing files.',
+  predictedCurrentLabel: 'Predicted Drive Current',
+  waitingCalcText: 'Waiting for calculation...',
+  teamSubtitle: 'Nine team members combining engineering, software development, machine learning, and experimental validation.',
+  footerTitle: 'Design your next microheater in minutes.',
+  footerCta: 'Try the designer',
+  footerResourcesTitle: 'Resources',
+  footerPaper: 'Paper',
+  footerGithub: 'GitHub',
+  footerInstitutionTitle: 'Institution',
+  footerDept: 'Department of Biomedical Engineering',
+  footerCity: 'Bogotá, Colombia',
+  footerCopyright: '© 2026 MICROHEATER DESIGN',
+  footerUniLine: 'UNIVERSIDAD DE LOS ANDES · BOGOTÁ'
+
+      },
+      es: {
+        dec: ' DISEÑO INVERSO POR ML ',
+        announce: 'Proyecto de investigación · Universidad de los Andes ·', announceLink: 'Lee el artículo [enlace] →',
+        nav0: 'Por qué', nav1: 'Diseñador', nav2: 'Equipo',
+        h1a: 'Define.', h1b: 'Predice.', h1c: 'Fabrica.',
+        sub: 'Empieza por la temperatura que necesitas. El modelo predice la geometría y corriente.',
+        whyEyebrow: 'Por qué', whyTitle: 'Deja de iterar. Empieza por el objetivo.',
+        whyLead: 'El rendimiento de un microcalentador depende en gran medida de su geometría y de sus condiciones de funcionamiento. Encontrar un diseño adecuado puede requerir simulaciones reiteradas, ajustes de parámetros y pruebas.',
+
+whyUsualLoop: 'El proceso habitual',
+whyLoopSubtitle: 'Un enfoque de ensayo y error',
+whyLoop1: 'Proponer una geometría',
+whyLoop2: 'Simular o probar el diseño',
+whyLoop3: 'Revisar la temperatura',
+whyLoop4: 'Ajustar el diseño',
+whyLoopFooter: 'Repetir hasta obtener el resultado esperado',
+
+whyToolFlow: 'Con Microheater Design',
+whyToolSubtitle: 'Un enfoque basado en la temperatura objetivo',
+whyTool1: 'Definir la temperatura objetivo',
+whyTool2: 'Obtener la geometría predicha',
+whyTool3: 'Exportar los archivos de geometría',
+whyToolFooter: 'Del objetivo a los archivos de fabricación',
+        howEyebrow: 'Diseñador', howTitle: 'Del objetivo a los archivos de fabricación.',
+        formTitle: 'Define tu objetivo',
+        teamEyebrow: 'Equipo', teamTitle: 'Las personas detrás de Microheater Design.',
+        whyStep1: 'Definir',
+whyStep1Desc: 'Definir la geometría del microcalentador.',
+whyStep2: 'Evaluar',
+whyStep2Desc: 'Simular o probar su respuesta térmica.',
+whyStep3: 'Comparar',
+whyStep3Desc: 'Comprobar si se alcanza la temperatura objetivo.',
+whyAdjust: 'Si no se alcanza la temperatura objetivo, ajustar el diseño y repetir.',
+whyReverse: 'Microheater Design aborda este problema',
+whyReverseHighlight: 'a la inversa.',
+whyReverseDesc: 'En lugar de partir de una geometría y preguntar qué temperatura producirá, el sistema parte de la respuesta térmica deseada y predice un diseño adecuado de microcalentador.',
+plateDimsLabel: 'Dimensiones de la placa (mm)',
+  xWidthLabel: 'X (Ancho)',
+  yLengthLabel: 'Y (Largo)',
+  targetTempLabel: 'Temperatura objetivo (°C)',
+  strategyLabel: 'Estrategia de optimización',
+  stratA: 'A: Solo Temp (Precisión)',
+  stratB: 'B: Eficiencia energética',
+  stratC: 'C: Alta uniformidad',
+  exportGeomLabel: 'Exportar geometría',
+  simTitle: 'Predicción y simulación',
+  simDesc: 'El motor de optimización calcula la geometría ideal usando Machine Learning según la estrategia elegida, validando restricciones físicas antes de generar los archivos para manufactura.',
+  predictedCurrentLabel: 'Corriente predicha',
+  waitingCalcText: 'Esperando cálculo...',
+  teamSubtitle: 'Nueve integrantes que combinan ingeniería, desarrollo de software, aprendizaje automático y validación experimental.',
+  footerTitle: 'Diseña tu próximo microcalentador en minutos.',
+  footerCta: 'Probar el diseñador',
+  footerResourcesTitle: 'Recursos',
+  footerPaper: 'Artículo',
+  footerGithub: 'GitHub',
+  footerInstitutionTitle: 'Institución',
+  footerDept: 'Departamento de Ingeniería Biomédica',
+  footerCity: 'Bogotá, Colombia',
+  footerCopyright: '© 2026 MICROHEATER DESIGN',
+  footerUniLine: 'UNIVERSIDAD DE LOS ANDES · BOGOTÁ'
+      }
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const t = this.dict()[s.lang];
+    const pill = (on) => 'min-width: 40px; height: 32px; border: none; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold; ' + (on ? 'background: #284269; color: #FFF' : 'background: transparent; color: #334155');
+    
+    return {
+      t, dec: s.dec, temp: s.temp,
+      isEn: s.lang === 'en', isEs: s.lang === 'es',
+      enStyle: pill(s.lang === 'en'), esStyle: pill(s.lang === 'es'),
+        setEn: () => { this.syncDesignerInputs(); this.setState({ lang: 'en' }); this.decrypt(); },
+        setEs: () => { this.syncDesignerInputs(); this.setState({ lang: 'es' }); this.decrypt(); },
+      setDotCanvas: this.setDotCanvas,
+      heroMove: (ev) => { const el = ev.currentTarget; const r = el.getBoundingClientRect(); this.mouse = { x: ev.clientX - r.left, y: ev.clientY - r.top }; },
+      heroLeave: () => { this.mouse = { x: -9999, y: -9999 }; },
+      onXInput: (ev) => { this.state.x = ev.target.value; },
+onYInput: (ev) => { this.state.y = ev.target.value; },
+onTempInput: (ev) => { this.state.temp = ev.target.value; },
+onStratChange: (ev) => { this.state.estrategia = ev.target.value; },
+
+xRef: (el) => { if (el && this.state.x !== undefined) el.value = this.state.x; },
+yRef: (el) => { if (el && this.state.y !== undefined) el.value = this.state.y; },
+tempRef: (el) => { if (el && this.state.temp !== undefined) el.value = this.state.temp; },
+stratRef: (el) => { if (el && this.state.estrategia !== undefined) el.value = this.state.estrategia; },
+    };
+  }
+}
+
+window.setDesignerField = function (key, val) {
+  if (window.inst && typeof window.inst.setState === 'function') {
+    window.inst.setState({ [key]: val });
+  }
+};
+
+mountDC(Component);
+/* Función para exportar y conectar con Flask */
 async function generarYDescargar(formato) {
-    const tempElem = document.getElementById('temp_objetivo');
+    const tempElem = document.getElementById('temp_target');
     const xElem = document.getElementById('x_length');
     const yElem = document.getElementById('y_length');
-    const nElem = document.getElementById('n');
-    const lzElem = document.getElementById('lz');
+    const estrategiaElem = document.getElementById('estrategia');
+
+    const progressBox = document.getElementById('download-progress-box');
+    const progressBar = document.getElementById('download-progress-bar');
+    const statusText = document.getElementById('download-status-text');
+    const percentText = document.getElementById('download-percent-text');
+
+    const currentValueText = document.getElementById('current-value-text');
+    const currentMetaText = document.getElementById('current-meta-text');
 
     const data = {
-        temp_objetivo: tempElem ? parseFloat(tempElem.value) : 45.0,
+        temp_target: tempElem ? parseFloat(tempElem.value) : 20.0,
         x_length: xElem ? parseFloat(xElem.value) : 30.0,
-        y_length: yElem ? parseFloat(yElem.value) : 35.0,
-        n: nElem ? parseInt(nElem.value) : 6,
-        lz: lzElem ? parseFloat(lzElem.value) : 3.0
+        y_length: yElem ? parseFloat(yElem.value) : 15.0,
+        estrategia: estrategiaElem ? estrategiaElem.value : 'A'
     };
 
-    const endpoint = `/generar_${formato}`;
+    // Mostrar barrita de carga
+    let pct = 15;
+    if (progressBox && progressBar && statusText && percentText) {
+        progressBox.style.display = 'block';
+        statusText.textContent = `Generating ${formato.toUpperCase()} & downloading...`;
+        percentText.textContent = `${pct}%`;
+        progressBar.style.width = `${pct}%`;
+    }
+
+    const timer = setInterval(() => {
+        if (pct < 85) {
+            pct += 10;
+            if (progressBar && percentText) {
+                progressBar.style.width = `${pct}%`;
+                percentText.textContent = `${pct}%`;
+            }
+        }
+    }, 160);
 
     try {
-        const resp = await fetch(endpoint, {
+        const resp = await fetch(`/generar_${formato}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-
         const res = await resp.json();
 
+        clearInterval(timer);
+
         if (resp.ok && res.status === 'ok') {
-            // Actualizamos el texto de la corriente si el elemento existe
-            const corrienteElem = document.getElementById('corrienteRes');
-            if (corrienteElem) {
-                corrienteElem.innerText = (res.corriente || "0.35") + " A";
+            if (progressBar && percentText && statusText) {
+                progressBar.style.width = '100%';
+                percentText.textContent = '100%';
+                statusText.textContent = 'Download ready!';
             }
 
-            // Descarga directa abriendo la URL del endpoint
+            // Mostrar corriente predicha desde Flask (en Amperios, como en resolver_inverso)
+            if (currentValueText && currentMetaText) {
+                if (res.corriente !== undefined && res.corriente !== null && !Number.isNaN(Number(res.corriente))) {
+                    const corrienteA = Number(res.corriente);
+                    const corrienteMA = (corrienteA * 1000).toFixed(1);
+                    currentValueText.textContent = `${corrienteA.toFixed(3)} A (${corrienteMA} mA)`;
+                } else {
+                    currentValueText.textContent = 'N/A';
+                }
+
+                const tempInfo = res.temperatura_lograda !== undefined ? ` · Pred: ${res.temperatura_lograda} °C` : '';
+                currentMetaText.textContent = `Strategy ${data.estrategia} · Target ${data.temp_target} °C${tempInfo}`;
+            }
+
             if (res.descarga_url) {
                 window.location.href = res.descarga_url;
             }
         } else {
-            alert('Error en el servidor: ' + (res.mensaje || 'Respuesta no válida.'));
+            if (statusText) statusText.textContent = 'Error generating file';
+            alert('Error: ' + (res.mensaje || 'No se pudo generar el archivo.'));
         }
-    } catch (error) {
-        console.error("Detalle del error en JS:", error);
-        alert("Ocurrió un error en la interfaz. Revisa la consola del navegador (F12).");
+    } catch (err) {
+        clearInterval(timer);
+        console.error(err);
+        if (statusText) statusText.textContent = 'Connection error';
+        alert('Error de conexión con Flask.');
     }
 }
+</script>
 
-        // 3. Animación de Scroll par 'Why'
-        const whySection = document.getElementById('why');
-        if (whySection) {
-            const observer = new IntersectionObserver(
-                (entries) => {
-                    entries.forEach((entry) => {
-                        if (entry.isIntersecting) {
-                            whySection.classList.add('why-visible');
-                            observer.unobserve(whySection);
-                        }
-                    });
-                },
-                { threshold: 0.25 }
-            );
-            observer.observe(whySection);
-        }
-
-        // 4. Comportamiento del Header al hacer Scroll
-        const header = document.getElementById('main-header');
-        if (header) {
-            let lastScrollY = window.scrollY;
-
-            window.addEventListener('scroll', () => {
-                const currentScrollY = window.scrollY;
-
-                if (currentScrollY <= 10) {
-                    header.classList.remove('-translate-y-full');
-                } else if (currentScrollY > lastScrollY) {
-                    header.classList.add('-translate-y-full');
-                } else {
-                    header.classList.remove('-translate-y-full');
-                }
-
-                lastScrollY = currentScrollY;
-            });
-        }
-    </script>
 </body>
 </html>
