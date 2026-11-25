@@ -6,8 +6,8 @@ def generar_microheater_comsol(
     y_length: float,
     lz: float,
     n: int,
-    a: float = 5.0,
-    distSepar: float = 1.35,
+    a: float = 2.0,
+    distSepar: float = 2,
     dpads: float = 1.7,
     hpads: float = 1.7,
     dist_entre_pads: float = 3.0,
@@ -186,8 +186,8 @@ def main():
     LZ = 3.0
     N = 6
 
-    MARGEN_A = 5.0
-    DIST_SEPAR = 1.35
+    MARGEN_A = 2.0
+    DIST_SEPAR = 2.0
     DPADS = 1.7
     HPADS = 1.7
     DIST_ENTRE_PADS = 3.0
